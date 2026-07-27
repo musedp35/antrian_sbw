@@ -51,7 +51,8 @@
         updateClock();
 
         // TTS Function untuk Display (Web Speech API)
-        let lastCalledTicketId = null;  // Tracking tiket terakhir yang dipanggil
+        let lastCalledTicketId = null;  // Tracking tiket terakhir yang dipanggil (by id)
+        let lastCalledUpdatedAt = null;  // Tracking timestamp update (untuk deteksi recall)
         let isSpeechEnabled = true;     // User bisa mute/unmute
 
         // Toggle audio ON/OFF
@@ -147,18 +148,26 @@
                 // Deteksi tiket baru yang dipanggil → trigger TTS
                 if (called) {
                     const currentTicketId = called.id || called.ticket_number;
+                    const currentUpdatedAt = called.updated_at || null;
 
-                    // Hanya trigger TTS jika tiket BERUBAH (bukan yang sama)
-                    if (lastCalledTicketId !== null && lastCalledTicketId !== currentTicketId) {
+                    // Deteksi apakah perlu trigger TTS:
+                    // 1. Call baru: tiket ID BERUBAH (transisi null → id, atau A → B)
+                    // 2. Recall: tiket ID SAMA tapi updated_at BERUBAH (akibat $ticket->touch() di recallAjax)
+                    const isNewCall = lastCalledTicketId !== null && lastCalledTicketId !== currentTicketId;
+                    const isRecall  = lastCalledTicketId === currentTicketId && currentUpdatedAt && lastCalledUpdatedAt !== currentUpdatedAt;
+
+                    if (isNewCall || isRecall) {
                         const ttsText = generateTTSText(called.ticket_number, called.type);
-                        console.log('TTS Triggered:', ttsText);
+                        console.log('TTS Triggered:', ttsText, '(isNewCall:', isNewCall, ', isRecall:', isRecall, ')');
                         speakText(ttsText);
                     }
 
                     lastCalledTicketId = currentTicketId;
+                    lastCalledUpdatedAt = currentUpdatedAt;
                     document.getElementById('called-number').parentElement.classList.add('animate-pulse');
                 } else {
                     lastCalledTicketId = null;
+                    lastCalledUpdatedAt = null;
                 }
 
                 // Waiting list

@@ -30,6 +30,9 @@ class DisplayApiController extends Controller
                     'tabungan' => 'Tabungan',
                     default => ucfirst($called->type),
                 },
+                // Penting: updated_at digunakan display untuk deteksi recall
+                // (recall tidak ubah id, hanya touch updated_at)
+                'updated_at'    => $called->updated_at->toIso8601String(),
             ] : null,
             'waiting' => $waiting->map(fn($t) => [
                 'id'            => $t->id,

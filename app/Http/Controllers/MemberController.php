@@ -19,6 +19,9 @@ class MemberController extends Controller
 
     /**
      * Proses pencetakan tiket (generate nomor antrian baru).
+     *
+     * Mengembalikan JSON response untuk AJAX popup di frontend.
+     * Includes broadcast notifikasi ke admin (sama seperti TicketController@store).
      */
     public function print(Request $request)
     {
@@ -37,6 +40,35 @@ class MemberController extends Controller
             ]);
         });
 
-        return view('members.ticket', compact('ticket'));
+        // Broadcast notifikasi ke admin (sama pattern dengan TicketController)
+        $this->broadcastTicketCreated($ticket);
+
+        // Return JSON untuk AJAX popup
+        return response()->json([
+            'success' => true,
+            'ticket'  => [
+                'id'            => $ticket->id,
+                'ticket_number' => $ticket->ticket_number,
+                'type'          => $ticket->type,
+                'created_at'    => $ticket->created_at->format('d/m/Y H:i'),
+            ],
+        ]);
+    }
+
+    /**
+     * Helper: broadcast notification untuk tiket baru ke semua admin users.
+     * (Copy pattern dari TicketController untuk konsistensi).
+     */
+    private function broadcastTicketCreated(Ticket $ticket): void
+    {
+        $adminUsers = \App\Models\User::whereNotNull('role')->get();
+        foreach ($adminUsers as $user) {
+            $notification = [
+                'ticket_number' => $ticket->ticket_number,
+                'type'          => $ticket->type,
+                'created_at'    => $ticket->created_at->format('d/m/Y H:i'),
+            ];
+            $user->notify(new \App\Notifications\NewTicketNotification($notification));
+        }
     }
 }
