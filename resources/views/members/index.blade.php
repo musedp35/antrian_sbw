@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cetak Tiket - Antrian SBW</title>
+    @vite(['resources/css/app.css'])
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen flex flex-col items-center justify-center px-4 py-8">
+
+    <div class="w-full max-w-5xl">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4 shadow-lg">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-gray-800 mb-2">Cetak Tiket Antrian</h1>
+            <p class="text-base md:text-lg text-gray-600">Koperasi Setia Bhakti Wanita</p>
+        </div>
+
+        <!-- Sub Header -->
+        <div class="text-center mb-6">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800">Pilih Tipe Layanan</h2>
+            <p class="text-sm text-gray-500 mt-1">Tekan salah satu kartu di bawah untuk mengambil nomor antrian</p>
+        </div>
+
+        <!-- Tombol Pilihan (sejajar horizontal) -->
+        <form method="POST" action="{{ route('members.print') }}">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+
+                <!-- Tombol SPP -->
+                <button type="submit" name="type" value="spp"
+                    class="ticket-card group relative overflow-hidden rounded-2xl bg-white hover:bg-blue-600 border-2 border-blue-300 hover:border-blue-700 shadow-md hover:shadow-2xl px-6 py-12 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer flex flex-col items-center justify-center text-center w-full">
+                    <!-- Icon Circle -->
+                    <div class="w-16 h-16 rounded-full bg-blue-100 group-hover:bg-white flex items-center justify-center mb-4 transition-all duration-300">
+                        <img src="{{ asset('images/icons/spp.png') }}" alt="SPP" class="w-10 h-10 object-contain">
+                    </div>
+                    <!-- Title -->
+                    <h3 class="text-2xl font-extrabold text-blue-700 group-hover:text-white uppercase tracking-wider mb-1 transition-colors">
+                        SPP
+                    </h3>
+                    <!-- Subtitle -->
+                    <p class="text-xs font-medium text-blue-500 group-hover:text-blue-100 transition-colors">
+                        Layanan SPP
+                    </p>
+                </button>
+
+                <!-- Tombol Tunai -->
+                <button type="submit" name="type" value="tunai"
+                    class="ticket-card group relative overflow-hidden rounded-2xl bg-white hover:bg-purple-600 border-2 border-purple-300 hover:border-purple-700 shadow-md hover:shadow-2xl px-6 py-12 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer flex flex-col items-center justify-center text-center w-full">
+                    <!-- Icon Circle -->
+                    <div class="w-16 h-16 rounded-full bg-purple-100 group-hover:bg-white flex items-center justify-center mb-4 transition-all duration-300">
+                        <img src="{{ asset('images/icons/setor_tunai.png') }}" alt="Tunai" class="w-10 h-10 object-contain">
+                    </div>
+                    <!-- Title -->
+                    <h3 class="text-2xl font-extrabold text-purple-700 group-hover:text-white uppercase tracking-wider mb-1 transition-colors">
+                        Tunai
+                    </h3>
+                    <!-- Subtitle -->
+                    <p class="text-xs font-medium text-purple-500 group-hover:text-purple-100 transition-colors">
+                        Layanan Tunai
+                    </p>
+                </button>
+
+                <!-- Tombol Tabungan -->
+                <button type="submit" name="type" value="tabungan"
+                    class="ticket-card group relative overflow-hidden rounded-2xl bg-white hover:bg-teal-600 border-2 border-teal-300 hover:border-teal-700 shadow-md hover:shadow-2xl px-6 py-12 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer flex flex-col items-center justify-center text-center w-full">
+                    <!-- Icon Circle -->
+                    <div class="w-16 h-16 rounded-full bg-teal-100 group-hover:bg-white flex items-center justify-center mb-4 transition-all duration-300">
+                        <img src="{{ asset('images/icons/tab_angsuran.png') }}" alt="Tabungan" class="w-10 h-10 object-contain">
+                    </div>
+                    <!-- Title -->
+                    <h3 class="text-2xl font-extrabold text-teal-700 group-hover:text-white uppercase tracking-wider mb-1 transition-colors">
+                        Tabungan
+                    </h3>
+                    <!-- Subtitle -->
+                    <p class="text-xs font-medium text-teal-500 group-hover:text-teal-100 transition-colors">
+                        Tabungan / Angsuran
+                    </p>
+                </button>
+            </div>
+        </form>
+
+        @if ($errors->any())
+            <div class="mt-6 bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- Info Langkah-langkah -->
+        <div class="bg-white rounded-2xl shadow-md p-6 mt-10">
+            <h3 class="text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Cara Pengambilan Tiket</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex items-start space-x-3 p-3 rounded-lg bg-blue-50">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm">1</div>
+                    <div>
+                        <p class="font-semibold text-gray-800 text-sm">Pilih Layanan</p>
+                        <p class="text-xs text-gray-500">Klik salah satu kartu layanan di atas</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3 p-3 rounded-lg bg-purple-50">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold text-sm">2</div>
+                    <div>
+                        <p class="font-semibold text-gray-800 text-sm">Cetak Tiket</p>
+                        <p class="text-xs text-gray-500">Sistem akan generate nomor antrian</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3 p-3 rounded-lg bg-teal-50">
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center font-bold text-sm">3</div>
+                    <div>
+                        <p class="font-semibold text-gray-800 text-sm">Tunggu Panggilan</p>
+                        <p class="text-xs text-gray-500">Pantau display untuk nomor Anda</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 text-sm text-gray-500">
+            <a href="{{ route('display') }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-white rounded-full shadow hover:shadow-md text-indigo-600 hover:text-indigo-800 transition-all">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Lihat Display Antrian
+            </a>
+            <span class="mx-2 text-gray-400">.</span>
+            <a href="{{ route('login') }}" class="hover:text-indigo-600">Login Admin</a>
+        </div>
+    </div>
+
+</body>
+</html>
