@@ -39,7 +39,9 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'cashier_name' => $item->assignedCashier->name ?? 'Unknown',
+                    // Tiket dari /members (tanpa login) tidak punya assigned_cashier_id
+                    // → tampilkan "Anggota" agar jelas bahwa tiket dicetak oleh member (publik)
+                    'cashier_name' => $item->assignedCashier->name ?? 'Anggota',
                     'total'        => $item->total,
                 ];
             });

@@ -5,6 +5,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        <!-- Notification Routes for Alpine Component -->
+        <script>
+            window.notificationRoutes = {
+                unreadCount: @json(route('api.notifications.unread-count')),
+                recent: @json(route('api.notifications.recent'))
+            };
+        </script>
+
         <title>{{ config('app.name', 'Sistem Antrian SBW') }}</title>
 
         <!-- Fonts -->

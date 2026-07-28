@@ -28,23 +28,23 @@
                 <div class="p-6">
                     @if($tickets->count() > 0)
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
+                        <table class="min-w-full bg-white">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Tiket</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipe</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kasir</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">No. Tiket</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">Tipe</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">Status</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">Kasir</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">Waktu</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="divide-y divide-gray-300">
                                 @foreach($tickets as $ticket)
                                 <tr class="{{ $ticket->status === 'called' ? 'bg-yellow-50' : ($ticket->status === 'waiting' ? 'bg-blue-50' : '') }}">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{{ $ticket->ticket_number }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">{{ $ticket->type }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 border-r border-gray-300">{{ $ticket->ticket_number }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize border-r border-gray-300">{{ $ticket->type }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap border-r border-gray-300">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                             {{ $ticket->status === 'waiting' ? 'bg-blue-100 text-blue-800' : '' }}
                                             {{ $ticket->status === 'called' ? 'bg-yellow-100 text-yellow-800' : '' }}
@@ -54,13 +54,13 @@
                                             {{ ucfirst($ticket->status) }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $ticket->assignedCashier?->name ?? '-' }}
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r border-gray-300">
+                                        {{ $ticket->assignedCashier?->name ?? 'Anggota' }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border-r border-gray-300">
                                         {{ $ticket->created_at->format('d/m/Y H:i') }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2 border-l border-gray-300">
                                         @if($ticket->status === 'waiting')
                                         <button type="button"
                                             data-action="call"
@@ -90,7 +90,7 @@
                                             data-action="cancel"
                                             data-ticket-id="{{ $ticket->id }}"
                                             data-cancel-url="{{ route('tickets.cancel', $ticket) }}"
-                                            class="text-red-600 hover:text-red-900 text-xs">
+                                            class="text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-xs">
                                             Batal
                                         </button>
                                     </td>

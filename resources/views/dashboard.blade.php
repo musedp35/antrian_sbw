@@ -5,7 +5,23 @@
         </h2>
     </x-slot>
 
-    <div class="py-12" x-data="{ stats: { total_today: {{ $totalToday }}, active_count: {{ $activeCount }}, by_type: { spp: {{ $byType['spp'] ?? 0 }}, tunai: {{ $byType['tunai'] ?? 0 }}, tabungan: {{ $byType['tabungan'] ?? 0 }}, by_status: { waiting: {{ ($byStatus['waiting'] ?? 0) }}, called: {{ ($byStatus['called'] ?? 0) }}, served: {{ ($byStatus['served'] ?? 0) }}, cancelled: {{ ($byStatus['cancelled'] ?? 0) }}}} } }">
+    <div class="py-12" x-data="{{ json_encode([
+    'stats' => [
+        'total_today' => $totalToday,
+        'active_count' => $activeCount,
+        'by_type' => [
+            'spp' => $byType['spp'] ?? 0,
+            'tunai' => $byType['tunai'] ?? 0,
+            'tabungan' => $byType['tabungan'] ?? 0
+        ],
+        'by_status' => [
+            'waiting' => $byStatus['waiting'] ?? 0,
+            'called' => $byStatus['called'] ?? 0,
+            'served' => $byStatus['served'] ?? 0,
+            'cancelled' => $byStatus['cancelled'] ?? 0
+        ]
+    ]
+]) }}">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             {{-- Stat Cards Row --}}
@@ -146,7 +162,7 @@
                                 <span class="text-sm font-bold text-gray-900">{{ $ticket->ticket_number }}</span>
                                 <span class="text-sm text-gray-500 capitalize">{{ $ticket->type }}</span>
                                 <span class="text-sm text-gray-500">
-                                    {{ $ticket->assignedCashier?->name ?? '-' }}
+                                    {{ $ticket->assignedCashier?->name ?? 'Anggota' }}
                                 </span>
                             </div>
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full

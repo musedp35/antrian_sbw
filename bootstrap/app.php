@@ -2,13 +2,8 @@
 
 /*
 |--------------------------------------------------------------------------
-| Create The Application
+| Create The Application Instance
 |--------------------------------------------------------------------------
-|
-| The first thing we will do is create a new Laravel application instance
-| which serves as the "glue" for all the components of Laravel, and is
-| the IoC container for the system binding all of the various parts.
-|
 */
 
 $app = new Illuminate\Foundation\Application(
@@ -17,13 +12,49 @@ $app = new Illuminate\Foundation\Application(
 
 /*
 |--------------------------------------------------------------------------
+| Bind config SERVICE EARLY - Fixes ReflectionException
+|--------------------------------------------------------------------------
+*/
+
+// Load .env variables first
+if (file_exists(__DIR__.'/../.env')) {
+    $lines = file(__DIR__.'/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (trim($line)[0] === '#') continue;
+        if (!str_contains($line, '=')) continue;
+        [$key, $value] = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        if (!array_key_exists($key, $_ENV)) {
+            $_ENV[$key] = $value;
+            putenv("$key=$value");
+        }
+    }
+}
+
+// Create initial config repository with minimum needed items
+$configInstance = new \Illuminate\Config\Repository([
+    'app' => [
+        'name' => $_ENV['APP_NAME'] ?? 'Sistem Antrian SBW',
+        'env' => $_ENV['APP_ENV'] ?? 'production',
+        'debug' => (bool)($_ENV['APP_DEBUG'] ?? false),
+        'url' => $_ENV['APP_URL'] ?? 'http://localhost',
+        'timezone' => 'UTC',
+        'locale' => 'en',
+        'fallback_locale' => 'en',
+        'providers' => [],
+    ],
+]);
+
+// Bind config to container IMMEDIATELY (before loading config files)
+$app->instance('config', $configInstance);
+$app->alias('config', \Illuminate\Config\Repository::class);
+$app->alias('config', \Illuminate\Contracts\Config\Repository::class);
+
+/*
+|--------------------------------------------------------------------------
 | Bind Important Interfaces
 |--------------------------------------------------------------------------
-|
-| Next, we need to bind some important interfaces into the container so
-| we will be able to resolve them when needed. The kernels serve the
-| incoming requests to this application from both the web and CLI.
-|
 */
 
 $app->singleton(
@@ -43,13 +74,34 @@ $app->singleton(
 
 /*
 |--------------------------------------------------------------------------
+| Load and merge all config files into the bound config repository
+|--------------------------------------------------------------------------
+*/
+
+$configFiles = glob(__DIR__.'/../config/*.php');
+foreach ($configFiles as $filename) {
+    $key = basename($filename, '.php');
+    $data = require $filename;
+    if (is_array($data)) {
+        $configInstance->set($key, $data);
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Register Service Providers
+|--------------------------------------------------------------------------
+*/
+
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
+$app->register(App\Providers\RouteServiceProvider::class);
+
+/*
+|--------------------------------------------------------------------------
 | Return The Application
 |--------------------------------------------------------------------------
-|
-| This script returns the application instance. The instance is given to
-| the calling script so we can separate the building of the instances
-| from the actual running of the application and sending responses.
-|
 */
 
 return $app;

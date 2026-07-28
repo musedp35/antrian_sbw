@@ -43,13 +43,34 @@ class NotificationController extends Controller
     }
 
     /**
-     * Mendapatkan jumlah notifikasi belum dibaca.
+     * Mendapatkan jumlah notifikasibelum dibaca.
      */
     public function countUnread()
     {
         $count = Auth::user()->unreadNotifications()->count();
 
         return response()->json(['count' => $count]);
+    }
+
+    /**
+     * Mendapatkan terbaru notifikasi untuk popup (terakhir 5 item).
+     */
+    public function recent()
+    {
+        $notifications = Auth::user()->notifications()
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return response()->json($notifications->map(function ($notification) {
+            $data = $notification->data ?? [];
+            return [
+                'id' => $notification->id,
+                'title' => isset($data['ticket_number']) ? 'Tiket Baru: ' . $data['ticket_number'] : 'Notifikasi Baru',
+                'message' => isset($data['type']) ? 'Tipe: ' . $data['type'] . ', ' . ($data['created_at'] ?? '') : '',
+                'created_at' => $notification->created_at,
+            ];
+        }));
     }
 
     /**

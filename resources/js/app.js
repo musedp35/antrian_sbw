@@ -1,10 +1,8 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
+import './notifications.js';
 
 window.Alpine = Alpine;
 
 Alpine.start();
-
-// Import notification manager for real-time alerts
-import './notifications.js';

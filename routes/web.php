@@ -21,9 +21,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+use Illuminate\Support\Facades\Auth;
+
+// Root route: cek apakah user login, jika tidak redirect ke login, jika ya ke dashboard
 Route::get('/', function () {
-    return view('welcome');
-});
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
+})->name('home');
 
 // Public display page (no auth needed)
 Route::get('/display', function () {

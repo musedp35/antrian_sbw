@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Setting;
 
 class Ticket extends Model
 {
@@ -39,15 +40,16 @@ class Ticket extends Model
     }
 
     /**
-     * Generate next ticket number based on type prefix.
+     * Generate next ticket number based on type prefix (with settings support).
      */
     public static function generateTicketNumber(string $type): string
     {
+        // Get prefix from settings or use defaults
         $prefix = match ($type) {
-            'spp' => 'A',
-            'tunai' => 'B',
-            'tabungan' => 'C',
-            default => 'A',
+            'spp'      => Setting::getValue('queue_prefix_spp', 'A'),
+            'tunai'    => Setting::getValue('queue_prefix_tunai', 'B'),
+            'tabungan' => Setting::getValue('queue_prefix_tabungan', 'C'),
+            default    => 'A',
         };
 
         // Get last ticket number for this type
@@ -56,8 +58,9 @@ class Ticket extends Model
             ->first();
 
         if ($lastTicket) {
-            // Extract number from "A-001" format
-            $lastNum = (int) substr($lastTicket->ticket_number, strlen($prefix) + 1);
+            // Extract number from format (prefix followed by hyphen and numbers)
+            $prefixLength = strlen($prefix);
+            $lastNum = (int) substr($lastTicket->ticket_number, $prefixLength + 1);
             $newNum = $lastNum + 1;
         } else {
             $newNum = 1;

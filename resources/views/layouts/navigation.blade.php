@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        <img src="{{ asset('images/logos/Logo_Sbw.png') }}" class="h-9 w-auto" alt="Logo SBW" />
                     </a>
                 </div>
 
@@ -36,19 +36,81 @@
                     <x-nav-link :href="route('history.index')" :active="request()->routeIs('history.*')">
                         {{ __('Riwayat') }}
                     </x-nav-link>
-                    @enderror
-            <button type="button" class="relative inline-flex items-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 p-2 ms-2"
-                    x-data="{ unreadCount: 0 }"
-                    x-init="setInterval(() => { fetch('{{ route('api.notifications.unread-count') }}').then(r => r.json()).then(d => unreadCount=d.count).catch(()=>{}); }, 5000);">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-                </svg>
-                <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full"></span>
-            </button>
-            <a href="{{ route('notifications.index') }}" class="ml-1 text-xs text-gray-500 hover:text-indigo-600 self-center">Lihat semua</a>
+                    @endorole
+                </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <div class="hidden sm:flex items-center space-x-4 h-16 relative">
+                    <!-- Separator/Spacer -->
+                    <div class="flex-1"></div>
+
+                    <!-- Notification and User Actions (Right Side) -->
+                    <div class="flex items-center space-x-3 relative">
+                <!-- Notification Bell Container (Shared Alpine Component) -->
+                <div x-data="notificationBell" class="relative">
+                    <!-- Notification Bell Button -->
+                    <button @click="showPopup = !showPopup; if (showPopup) loadNotifications()"
+                            @mousedown.stop
+                            @keyup.escape="closePopup()"
+                            type="button"
+                            class="relative inline-flex items-center justify-center text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-full w-10 h-10"
+                            x-init="startUnreadInterval(); loadUnreadCount()">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9zm-3.75 3.15a.75.75 0 100-1.5.75.75 0 000 1.5z" />
+                        </svg>
+                        <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute top-[-4px] right-[-4px] flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-600 rounded-full shadow-sm z-10" style="transform: translate(50%, -50%);"></span>
+                    </button>
+
+                    <!-- Notification Bell Popup -->
+                    <div x-show="showPopup"
+                         @click.away="closePopup()"
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 translate-y-2"
+                         class="absolute top-14 left-0 sm:right-0 w-80 sm:w-96 max-h-96 overflow-y-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+                         x-cloak>
+                    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                        <h3 class="text-sm font-semibold text-gray-900">Notifikasi</h3>
+                    </div>
+                    <div class="py-2">
+                        <div x-show="isLoading" class="text-center py-4">
+                            <div class="inline-flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-md border border-gray-200">
+                                <div class="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                            <p class="text-sm text-gray-700 mt-3 font-medium">Memuat data notifikasi...</p>
+                        </div>
+                        <div x-show="!isLoading && notifications.length > 0" class="space-y-1 px-2">
+                            <template x-for="(notification, index) in notifications" :key="index">
+                                <div class="p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <div class="font-medium text-sm text-gray-800" x-text="notification.title"></div>
+                                    <div class="text-xs text-gray-600 mt-1" x-text="notification.message"></div>
+                                    <div class="text-xs text-gray-400 mt-1">
+                                        ⏱ <span x-text="new Date(notification.created_at).toLocaleString('id-ID')"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <div x-show="!isLoading && notifications.length === 0" class="text-center py-6">
+                            <div class="text-3xl mb-2">📭</div>
+                            <p class="text-sm text-gray-500">Tidak ada notifikasi baru</p>
+                        </div>
+                    </div>
+                    <div class="px-4 py-2 border-t border-gray-200 bg-gray-50">
+                        <a href="{{ route('notifications.index') }}"
+                           class="block text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors flex items-center justify-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                            </svg>
+                            Lihat Semua Notifikasi
+                        </a>
+                    </div>
+                </div>
+                </div>
+                <!-- End of Notification Bell Container -->
+
+                <!-- User Dropdown (Super Admin) -->
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -84,10 +146,11 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
-            </div>
+                    <!-- End of Notification & User Actions Container -->
+                    </div>
 
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
+                    <!-- Hamburger (Right Side) -->
+                    <div class="flex items-center sm:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -120,7 +183,7 @@
             <x-responsive-nav-link :href="route('history.index')" :active="request()->routeIs('history.*')">
                 {{ __('Riwayat') }}
             </x-responsive-nav-link>
-            @enderror
+            @endorole
         </div>
 
         <!-- Responsive Settings Options -->

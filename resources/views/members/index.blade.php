@@ -20,13 +20,11 @@
     <div class="w-full max-w-5xl">
         <!-- Header -->
         <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 rounded-full mb-4 shadow-lg">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                </svg>
+            <div class="inline-flex items-center justify-center w-20 h-20 mb-4">
+                <img src="{{ asset('images/logos/Logo_Sbw.png') }}" alt="Logo SBW" class="w-full h-full object-contain">
             </div>
-            <h1 class="text-3xl md:text-5xl font-extrabold text-gray-800 mb-2">Cetak Tiket Antrian</h1>
-            <p class="text-base md:text-lg text-gray-600">Koperasi Setia Bhakti Wanita</p>
+            <h1 class="text-4xl md:text-6xl font-black text-gray-800 mb-2">Antrian SBW</h1>
+            <p class="text-lg md:text-xl text-gray-600">Koperasi Setia Bhakti Wanita</p>
         </div>
 
         <!-- Sub Header -->
@@ -118,18 +116,7 @@
             </div>
         </div>
 
-        <!-- Footer -->
-        <div class="text-center mt-8 text-sm text-gray-500">
-            <a href="{{ route('display') }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-white rounded-full shadow hover:shadow-md text-indigo-600 hover:text-indigo-800 transition-all">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-                Lihat Display Antrian
-            </a>
-            <span class="mx-2 text-gray-400">.</span>
-            <a href="{{ route('login') }}" class="hover:text-indigo-600">Login Admin</a>
-        </div>
-    </div>
+            </div>
 
     <!-- ============ MODAL POPUP TIKET ============ -->
     <div id="ticketModal" class="hidden fixed inset-0 z-50 items-center justify-center px-4 py-8 modal-bg-overlay bg-black/60 backdrop-blur-sm">
@@ -137,31 +124,31 @@
              id="modalCardBorder">
 
             <!-- Header Tiket (warna sesuai type) -->
-            <div id="modalHeader" class="text-center py-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                <h1 class="text-2xl font-bold">KOPERASI SBW</h1>
-                <p class="text-sm opacity-90">Sistem Antrian</p>
+            <div id="modalHeader" class="text-center py-5 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                <h1 class="text-base font-medium tracking-wide">KOPERASI SETIA BHAKTI WANITA</h1>
+                <p class="text-xs opacity-90 mt-1">Sistem Antrian</p>
             </div>
 
             <!-- Body Tiket -->
             <div class="p-8 text-center">
-                <p class="text-sm text-gray-500 uppercase tracking-widest mb-2">Nomor Antrian Anda</p>
+                <p class="text-xs text-gray-500 uppercase tracking-widest mb-2">Nomor Antrian Anda</p>
 
                 <div class="my-6">
-                    <div id="ticketNumber" class="text-7xl md:text-8xl font-black text-blue-600">
+                    <div id="ticketNumber" class="text-6xl md:text-6xl font-black text-blue-600">
                         -
                     </div>
                 </div>
 
-                <div id="ticketBadge" class="inline-block px-6 py-2 rounded-full text-white text-lg font-semibold bg-blue-500">
+                <div id="ticketBadge" class="inline-block px-5 py-1.5 rounded-full text-white text-base font-semibold bg-blue-500 mt-3 mb-4">
                     SPP
                 </div>
 
-                <div class="mt-6 text-sm text-gray-600">
-                    <p>Tanggal: <strong id="ticketDate">-</strong></p>
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600"><strong>Tanggal:</strong> <span id="ticketDate">-</span></p>
                 </div>
 
-                <div class="mt-6 pt-6 border-t border-gray-200 text-xs text-gray-500">
-                    <p>⚠️ Simpan tiket ini dan tunggu panggilan di layar display</p>
+                <div class="pt-4 border-t border-gray-200">
+                    <p class="text-xs text-gray-500">⚠️ Simpan tiket ini dan tunggu panggilan di layar display</p>
                 </div>
             </div>
 
@@ -192,7 +179,7 @@
             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <span>Otomatis tertutup dalam <strong id="countdownText" class="text-indigo-600">30</strong> detik</span>
+            <span>Otomatis tertutup dalam <strong id="countdownText" class="text-indigo-600">5</strong> detik</span>
         </div>
     </div>
 
@@ -288,8 +275,8 @@
             // Reset class lalu apply config sesuai type
             modalHeader.className   = 'text-center py-6 text-white ' + config.headerGradient;
             modalBorder.className   = 'w-full max-w-md modal-card bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-dashed ' + config.borderColor;
-            ticketNumberEl.className = 'text-7xl md:text-8xl font-black ' + config.textColor;
-            ticketBadgeEl.className  = 'inline-block px-6 py-2 rounded-full text-white text-lg font-semibold ' + config.badgeColor;
+            ticketNumberEl.className = 'text-6xl md:text-6xl font-black ' + config.textColor;
+            ticketBadgeEl.className  = 'inline-block px-5 py-1.5 rounded-full text-white text-base font-semibold ' + config.badgeColor;
 
             // Isi konten
             ticketNumberEl.textContent = ticket.ticket_number;
@@ -316,15 +303,15 @@
                 clearInterval(countdownTimer);
                 countdownTimer = null;
             }
-            countdownRemaining = 30;
-            if (countdownTextEl) countdownTextEl.textContent = '30';
+            countdownRemaining = 5;
+            if (countdownTextEl) countdownTextEl.textContent = '5';
         }
 
         /**
          * Auto-close countdown (30 detik).
          */
         function startCountdown() {
-            countdownRemaining = 30;
+            countdownRemaining = 5;
             if (countdownTextEl) countdownTextEl.textContent = countdownRemaining;
 
             if (countdownTimer) clearInterval(countdownTimer);

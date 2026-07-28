@@ -1,7 +1,71 @@
+import Alpine from 'alpinejs';
+
+// Register Notification Bell Alpine Data
+Alpine.data('notificationBell', () => ({
+    unreadCount: 0,
+    showPopup: false,
+    isLoading: false,
+    notifications: [],
+    unreadInterval: null,
+
+    init() {
+        console.log('[Notification Bell] Alpine component initialized');
+        this.startUnreadInterval();
+        this.loadUnreadCount();
+    },
+
+    loadUnreadCount() {
+        if (!window.notificationRoutes || !window.notificationRoutes.unreadCount) {
+            console.error('Notification route not configured');
+            return;
+        }
+        this.fetchNotifications(window.notificationRoutes.unreadCount)
+            .then(data => { this.unreadCount = data.count || 0; })
+            .catch(e => { this.unreadCount = 0; });
+    },
+
+    loadNotifications() {
+        if (!this.showPopup || this.isLoading) return;
+        if (!window.notificationRoutes || !window.notificationRoutes.recent) return;
+        this.isLoading = true;
+        this.fetchNotifications(window.notificationRoutes.recent)
+            .then(data => { this.notifications = Array.isArray(data) ? data : []; })
+            .catch(() => { this.notifications = []; })
+            .finally(() => { this.isLoading = false; });
+    },
+
+    fetchNotifications(url) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        return fetch(url, {
+            headers: {'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
+            credentials: 'same-origin'
+        }).then(r => {
+            if (r.status === 401 || r.status === 403) throw new Error('Not authorized');
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        });
+    },
+
+    startUnreadInterval() {
+        if (this.unreadInterval) clearInterval(this.unreadInterval);
+        this.unreadInterval = setInterval(() => this.loadUnreadCount(), 15000);
+    },
+
+    closePopup() {
+        this.showPopup = false;
+        this.isLoading = false;
+    },
+
+    formatDate(dateString) {
+        if (!dateString) return '';
+        try { return new Date(dateString).toLocaleString('id-ID'); }
+        catch (e) { return dateString; }
+    }
+}));
+
 /**
  * Web Notification API untuk Sistem Antrian
  */
-
 class TicketNotificationManager {
     constructor() {
         this.lastSeen = null;
@@ -14,27 +78,16 @@ class TicketNotificationManager {
         this.requestPermission();
         this.createToastContainer();
         this.startPolling();
-        console.log('Ticket Notification Manager initialized');
     }
 
     requestPermission() {
-        if (!('Notification' in window)) {
-            console.warn('Browser ini tidak mendukung notifikasi web.');
-            return;
-        }
-
+        if (!('Notification' in window)) return;
         if (Notification.permission === 'granted') {
             this.isAllowed = true;
             return;
         }
-
         Notification.requestPermission().then(permission => {
             this.isAllowed = permission === 'granted';
-            if (this.isAllowed) {
-                console.log('Izin notifikasi diberikan');
-            } else {
-                console.log('Izin notifikasi ditolak');
-            }
         });
     }
 
@@ -48,118 +101,59 @@ class TicketNotificationManager {
 
     showToast(title, message, options = {}) {
         if (this.isAllowed && ('Notification' in window)) {
-            new Notification(title, {
-                body: message,
-                icon: '/favicon.ico',
-                tag: Date.now() + Math.random(),
-                requireInteraction: true,
-            });
+            new Notification(title, { body: message, icon: '/favicon.ico', tag: Date.now(), requireInteraction: true });
         }
         this.renderToast(title, message, options.color || '#3B82F6');
     }
 
     renderToast(title, message, color = '#3B82F6') {
         if (!this.toastContainer) return;
-
         const toast = document.createElement('div');
-        const currentTime = new Date().toLocaleTimeString('id-ID');
-
-        toast.innerHTML = `<div style="background: white; border-left: 4px solid ${color}; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 16px; min-width: 300px; max-width: 350px; border-radius: 8px; margin-bottom: 10px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="font-weight: bold; color: #1F2937;">${title}</span>
-                <button onclick="this.parentElement.parentElement.remove();" style="background: none; border: none; cursor: pointer; color: #6B7280; font-size: 16px;">x</button>
-            </div>
-            <p style="color: #6B7280; font-size: 13px; margin: 0;">${message}</p>
-            <span style="color: #9CA3AF; font-size: 11px;">${currentTime}</span>
-        </div>`;
-
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        toast.style.transition = 'all 0.3s ease';
-
+        const time = new Date().toLocaleTimeString('id-ID');
+        toast.innerHTML = '<div style="background: white; border-left: 4px solid ' + color + '; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 16px; min-width: 300px; border-radius: 8px; margin-bottom: 10px;"><div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: bold; color: #1F2937;">' + title + '</span><button onclick="this.parentElement.parentElement.remove();" style="background:none;cursor:pointer;color:#6B7280;">x</button></div><p style="color:#6B7280;font-size:13px;margin:0;">' + message + '</p><span style="color:#9CA3AF;font-size:11px;">' + time + '</span></div>';
+        toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; toast.style.transition = 'all 0.3s ease';
         this.toastContainer.appendChild(toast);
-
+        setTimeout(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(0)'; }, 10);
         setTimeout(() => {
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateX(0)';
-        }, 10);
-
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100%)';
+            toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)';
             setTimeout(() => toast.remove(), 300);
         }, 5000);
     }
 
     startPolling() {
         this.lastSeen = new Date().toISOString();
-
-        this.pollingInterval = setInterval(async () => {
-            await this.fetchNewTickets();
-        }, 10000);
+        this.pollingInterval = setInterval(async () => await this.fetchNewTickets(), 10000);
     }
 
-    stopPolling() {
-        if (this.pollingInterval) {
-            clearInterval(this.pollingInterval);
-        }
-    }
+    stopPolling() { if (this.pollingInterval) clearInterval(this.pollingInterval); }
 
     async fetchNewTickets() {
         try {
             const url = '/api/tickets/new?last_seen=' + encodeURIComponent(this.lastSeen);
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                }
-            });
-
-            if (!response.ok) return;
-
-            const data = await response.json();
-
+            const resp = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
+            if (!resp.ok) return;
+            const data = await resp.json();
             if (data.tickets.length > 0) {
                 this.lastSeen = data.tickets[0].created_at;
-                data.tickets.forEach(ticket => {
-                    this.showNewTicketNotification(ticket);
-                });
+                data.tickets.forEach(t => this.showNewTicketNotification(t));
             }
-        } catch (error) {
-            console.error('Error fetching new tickets:', error);
-        }
+        } catch (e) { console.error(e); }
     }
 
     showNewTicketNotification(ticket) {
-        const typeColors = {
-            'Spp': '#3B82F6',
-            'Tunai': '#8B5CF6',
-            'Tabungan': '#10B981',
-        };
-
-        const title = 'Antrian Baru Dipanggil!';
-        const message = 'Tiket ' + ticket.ticket_number + ' (' + ticket.type + ') sedang dilayani';
-
-        this.showToast(title, message, {
-            color: typeColors[ticket.type] || '#3B82F6'
-        });
+        const colors = { Spp: '#3B82F6', Tunai: '#8B5CF6', Tabungan: '#10B981' };
+        this.showToast('Antrian Baru Dipanggil!', 'Tiket ' + ticket.ticket_number + ' (' + ticket.type + ') sedang dilayani', { color: colors[ticket.type] || '#3B82F6' });
     }
 
     cleanup() {
         this.stopPolling();
-        if (this.toastContainer && this.toastContainer.parentNode) {
-            this.toastContainer.parentNode.removeChild(this.toastContainer);
-        }
+        if (this.toastContainer && this.toastContainer.parentNode) this.toastContainer.parentNode.removeChild(this.toastContainer);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     const paths = ['/tickets', '/dashboard'];
-    const currentPath = window.location.pathname;
-
-    if (paths.some(path => currentPath.startsWith(path))) {
+    if (paths.some(p => window.location.pathname.startsWith(p))) {
         const manager = new TicketNotificationManager();
         manager.init();
         window.ticketNotificationManager = manager;

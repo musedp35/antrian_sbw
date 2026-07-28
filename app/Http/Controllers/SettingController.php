@@ -19,9 +19,18 @@ class SettingController extends Controller
             'general' => ['title' => 'Konfigurasi Umum', 'settings' => []],
         ];
 
+        // PERFORMANCE FIX: Load all settings at once (avoid N+1 query)
         $settings = Setting::orderBy('group')->orderBy('key')->get();
+        $settingsByKey = $settings->keyBy('key');
+
+        // Build a values cache to avoid repeated Setting::getValue() DB calls
+        $valuesCache = [];
         foreach ($settings as $s) {
-            $val = Setting::getValue($s->key, null);
+            $valuesCache[$s->key] = $this->castValue($s->value, $s->type);
+        }
+
+        foreach ($settings as $s) {
+            $val = $valuesCache[$s->key] ?? null;
             $groups[$s->group]['settings'][] = [
                 'key'       => $s->key,
                 'value'     => is_bool($val) ? ($val ? 'true' : 'false') : $val,
@@ -31,6 +40,18 @@ class SettingController extends Controller
         }
 
         return view('settings.index', compact('groups'));
+    }
+
+    /**
+     * Cast setting value based on type.
+     */
+    private function castValue(?string $value, string $type): mixed
+    {
+        return match ($type) {
+            'number'  => (int) $value,
+            'boolean' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            default   => $value,
+        };
     }
 
     /**
@@ -45,19 +66,27 @@ class SettingController extends Controller
 
         DB::beginTransaction();
         try {
+            // PERFORMANCE FIX: Load all relevant settings once
+            $keys = array_column($validated['settings'], 'key');
+            $existingSettings = Setting::whereIn('key', $keys)->get()->keyBy('key');
+
             foreach ($validated['settings'] as $item) {
                 // Only update keys that exist in database
-                $setting = Setting::where('key', $item['key'])->first();
+                $setting = $existingSettings[$item['key']] ?? null;
                 if (!$setting) continue;
 
                 // Skip empty values for non-boolean types
-                if (empty($item['value']) && !is_bool(Setting::getValue($item['key'], null))) {
+                $currentVal = $this->castValue($setting->value, $setting->type);
+                if (empty($item['value']) && !is_bool($currentVal)) {
                     continue;
                 }
 
                 $setting->update(['value' => $item['value']]);
             }
             DB::commit();
+
+            // Clear config cache so changes take effect
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
 
             session()->flash('success', 'Pengaturan berhasil disimpan.');
         } catch (\Exception $e) {
@@ -66,5 +95,14 @@ class SettingController extends Controller
         }
 
         return redirect()->route('settings.index');
+    }
+
+    /**
+     * API endpoint for frontend (display) to retrieve settings.
+     */
+    public function apiIndex()
+    {
+        $settings = Setting::pluck('value', 'key');
+        return response()->json($settings);
     }
 }
