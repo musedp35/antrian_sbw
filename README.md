@@ -107,7 +107,7 @@ Pastikan sudah terinstall:
 
 | Tampilan Display | Tampilan Manajemen Antrian |
 |:----------------:|:--------------------------:|
-| ![Display](Cuplikan layar display.png) | Coming Soon |
+| ![Display](Cuplikan-layar-display.png) | Coming Soon |
 
 </div>
 
