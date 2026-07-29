@@ -153,82 +153,128 @@
                 flex: 1 1 calc(16.666667% - 0.875rem);
             }
         }
-        /* === Flip Clock Light Theme (matching display background) === */
+        /* === Flip Clock — Classic 3D Card Flip Animation (More Natural) === */
         .flip-clock {
-            /* Background cream lembut tanpa border (sesuai permintaan: hilangkan outline) */
-            background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+            background: transparent;
             border: none;
             box-shadow: none;
             visibility: visible !important;
             opacity: 1 !important;
             display: flex !important;
+            gap: 4px;
+            perspective: 1000px;
         }
-        .flip-digit {
-            display: inline-block;
+        .flip-digit-card {
             position: relative;
-            min-width: 1.6ch;
-            min-height: 2rem;
-            padding: 0.2rem 0.55rem;
-            margin: 0 1px;
+            display: inline-block;
+            width: 1.5ch;
+            height: 2.5rem;
+            border-radius: 6px;
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             color: #ffffff;
             font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
             font-weight: 900;
-            font-size: 1.75rem;
+            font-size: 1.9rem;
             line-height: 1;
-            border-radius: 6px;
             text-align: center;
-            vertical-align: middle;
+            overflow: hidden; /* Keep content within rounded bounds — parent clipping */
             box-shadow:
-                inset 0 -2px 0 rgba(0,0,0,0.6),
-                inset 0 1px 0 rgba(255,255,255,0.2),
-                0 2px 4px rgba(0,0,0,0.4);
-            text-shadow: 0 1px 0 rgba(0,0,0,0.7);
-            backface-visibility: visible;
-            -webkit-backface-visibility: visible;
-            visibility: visible !important;
-            opacity: 1 !important;
+                0 2px 4px rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            will-change: transform;
+            transform-style: preserve-3d; /* Enable 3D context for inner wrapper */
+            perspective: 1000px; /* Depth for flip effect */
         }
-        /* Flip animation: 2D scale Y (lebih reliable di semua browser) */
-        .flip-digit.flip-flash {
-            animation: digitFlip 0.65s ease-in-out;
+        /* ========== Classic Two-Face Flip Animation (Proven Reliable) =========== */
+/* Both back and front share base styles */
+        .flip-digit-card .card-face {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            /* Critical: preserve-3d for correct nested transform behavior */
+            transform-style: preserve-3d;
+            will-change: transform;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            color: #ffffff;
         }
-        @keyframes digitFlip {
-            0%   { transform: scaleY(1); background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); color: #ffffff; }
-            45%  { transform: scaleY(0); background: linear-gradient(180deg, #f9f1dd 0%, #353330 100%); color: #fff; }
-            50%  { transform: scaleY(0); background: linear-gradient(180deg, #f9f1dd 0%, #353330 100%); color: #fff; }
-            60%  { transform: scaleY(0); background: linear-gradient(180deg, #f9f1dd 0%, #353330 100%); color: #fff; }
-            100% { transform: scaleY(1); background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); color: #ffffff; }
+
+        /* BACK FACE: visible initially (normal orientation) */
+        .flip-digit-card .card-face.back {
+            transform: rotateX(0deg) translateZ(0);
+        }
+
+        /* FRONT FACE: initially hidden behind (rotated 180deg) */
+        .flip-digit-card .card-face.front {
+            transform: rotateX(-180deg) translateZ(0);
+        }
+
+        /* Flip animation class: animate BOTH faces simultaneously but in opposite directions */
+        .flip-digit-card.flipping .card-face.back {
+            animation: flipBack 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .flip-digit-card.flipping .card-face.front {
+            animation: flipFront 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        /* Keyframes: back face rotates from 0° → -180°, becomes hidden behind */
+        @keyframes flipBack {
+            0%   { transform: rotateX(0deg) translateZ(0); }
+            100% { transform: rotateX(-180deg) translateZ(0); }
+        }
+
+        /* Keyframes: front face rotates from -180° → 0°, emerges as front face */
+        /* Note: start at -180° so that after flipping, net rotation = 0° (upright!) */
+        @keyframes flipFront {
+            0%   { transform: rotateX(-180deg) translateZ(0); }
+            100% { transform: rotateX(0deg) translateZ(0); }
         }
         .flip-separator {
             color: #1e293b;
             font-size: 1.6rem;
             font-weight: 900;
-            animation: separatorBlink 1s steps(2, end) infinite;
+            animation: separatorBlink 1s ease-in-out infinite;
             font-family: 'Courier New', monospace;
+            align-self: center;
             visibility: visible !important;
+            margin: 0 1px;
         }
         @keyframes separatorBlink {
             0%, 100% { opacity: 1; }
-            50%      { opacity: 0.4; }
+            50%      { opacity: 0.35; }
         }
         .flip-digit-group {
             display: inline-flex;
             align-items: center;
-            gap: 1px;
+            gap: 3px;
         }
         /* Responsive sizing */
         @media (max-width: 640px) {
-            .flip-digit { font-size: 1.1rem; padding: 0.1rem 0.35rem; min-width: 1.2ch; }
-            .flip-separator { font-size: 1rem; }
+            .flip-digit-card { width: 1.1ch; height: 1.7rem; font-size: 1.05rem; border-radius: 5px; }
+            /* No need — border-radius is handled by parent .flip-digit-card */
+            .flip-separator { font-size: 0.95rem; }
+            .flip-digit-group { gap: 2px; }
+            .flip-clock { gap: 3px; }
         }
         @media (min-width: 1024px) {
-            .flip-digit { font-size: 1.85rem; padding: 0.25rem 0.6rem; min-width: 1.6ch; }
+            .flip-digit-card { width: 1.5ch; height: 2.6rem; font-size: 1.85rem; }
+            /* No need — border-radius is handled by parent .flip-digit-card */
             .flip-separator { font-size: 1.7rem; }
         }
         @media (min-width: 1280px) {
-            .flip-digit { font-size: 2.1rem; padding: 0.3rem 0.7rem; }
+            .flip-digit-card { width: 1.6ch; height: 2.9rem; font-size: 2.1rem; }
+            /* No need — border-radius is handled by parent .flip-digit-card */
             .flip-separator { font-size: 1.9rem; }
+        }
+        /* Reduce motion preference: respect user setting */
+        @media (prefers-reduced-motion: reduce) {
+            .flip-digit-card.flipping .card-face {
+                animation: none;
+            }
+            .flip-separator { animation: none; }
         }
 
         /* === Fullscreen Desktop Layout === */
@@ -296,19 +342,40 @@
 
             {{-- Kanan: Flip Clock --}}
             <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                {{-- Flip Clock Container (visible sm+) --}}
+                {{-- Flip Clock Container (visible sm+) — Simple Back-to-Front Flip Animation --}}
                 <div id="flip-clock-wrapper" class="flex items-center" style="visibility: visible; opacity: 1;">
-                    <div id="flip-clock" class="flip-clock flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl shadow-md">
+                    <div id="flip-clock" class="flip-clock flex items-center px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl">
                         <div class="flip-digit-group">
-                            <span id="flip-hh1" class="flip-digit">0</span><span id="flip-hh2" class="flip-digit">0</span>
+                            <div id="flip-hh1" class="flip-digit-card">
+                                <span class="card-face back">0</span>
+                                    <span class="card-face front">0</span>
+                            </div>
+                            <div id="flip-hh2" class="flip-digit-card">
+                                <span class="card-face back">0</span>
+                                    <span class="card-face front">0</span>
+                            </div>
                         </div>
                         <span class="flip-separator">:</span>
                         <div class="flip-digit-group">
-                            <span id="flip-mm1" class="flip-digit">0</span><span id="flip-mm2" class="flip-digit">0</span>
+                            <div id="flip-mm1" class="flip-digit-card">
+                                <span class="card-face back">0</span>
+                                    <span class="card-face front">0</span>
+                            </div>
+                            <div id="flip-mm2" class="flip-digit-card">
+                                <span class="card-face back">0</span>
+                                    <span class="card-face front">0</span>
+                            </div>
                         </div>
                         <span class="flip-separator">:</span>
                         <div class="flip-digit-group">
-                            <span id="flip-ss1" class="flip-digit">0</span><span id="flip-ss2" class="flip-digit">0</span>
+                            <div id="flip-ss1" class="flip-digit-card">
+                                <span class="card-face back">0</span>
+                                    <span class="card-face front">0</span>
+                            </div>
+                            <div id="flip-ss2" class="flip-digit-card">
+                                <span class="card-face back">0</span>
+                                    <span class="card-face front">0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -425,26 +492,50 @@
                 year: 'numeric'
             });
 
-            // Update flip clock (6 digit terpisah) dengan animasi flip top/bottom
-            const flipMap = {
-                'flip-hh1': hh[0], 'flip-hh2': hh[1],
-                'flip-mm1': mm[0], 'flip-mm2': mm[1],
-                'flip-ss1': ss[0], 'flip-ss2': ss[1],
-            };
-            Object.keys(flipMap).forEach(id => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                const nextVal = flipMap[id];
-                const prevVal = el.textContent;
-                if (prevVal !== nextVal) {
-                    // Trigger flip animation: set textContent dulu agar saat flip mid-point, digit sudah berubah
-                    el.textContent = nextVal;
-                    el.classList.remove('flip-flash');
-                    void el.offsetWidth; // force reflow
-                    el.classList.add('flip-flash');
-                    setTimeout(() => el.classList.remove('flip-flash'), 650);
-                }
-            });
+            // Update flip clock (6 digit terpisah) dengan animasi flip card 3D
+// .card-face.back: OLD digit (terlihat sebelum flip)
+// .card-face.front: NEW digit (tersembunyi di belakang, berputar menjadi depan saat flip)
+const flipMap = {
+    'flip-hh1': hh[0], 'flip-hh2': hh[1],
+    'flip-mm1': mm[0], 'flip-mm2': mm[1],
+    'flip-ss1': ss[0], 'flip-ss2': ss[1],
+};
+// Cache previous values agar deteksi perubahan lebih akurat
+if (!window._flipPrev) window._flipPrev = {};
+Object.keys(flipMap).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const nextVal = flipMap[id];
+    const prevVal = window._flipPrev[id];
+
+    const cardBack = el.querySelector('.card-face.back');
+    const cardFront = el.querySelector('.card-face.front');
+
+    if (prevVal === undefined) {
+        // Render pertama — kedua face sama (tidak ada animasi)
+        cardBack.textContent = nextVal;
+        cardFront.textContent = nextVal;
+        window._flipPrev[id] = nextVal;
+        return;
+    }
+    if (prevVal !== nextVal) {
+        // 1. Face depan disiapkan dengan digit BARU (masih tersembunyi di belakang, rotateX 180deg)
+        cardFront.textContent = nextVal;
+
+        // Trigger reflow supaya class flipping diaplikasikan dengan benar
+        el.classList.remove('flipping');
+        void el.offsetWidth;
+        el.classList.add('flipping');
+
+        // Setelah animasi selesai (~650ms):
+        // Ubah face belakang menjadi digit baru (siap untuk flip berikutnya)
+        // Face depan sudah berisi digit baru dan sudah terlihat setelah flip
+        setTimeout(() => {
+            cardBack.textContent = nextVal;
+            window._flipPrev[id] = nextVal;
+        }, 655);
+    }
+});
 
             // Update fallback mobile clock
             const clockMobile = document.getElementById('clock-mobile');
