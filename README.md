@@ -1,7 +1,153 @@
-# Antrian SBW - Sistem Antrian Multi-Loket
+<div align="center">
 
-Aplikasi **Sistem Antrian** berbasis web untuk manajemen antrian multi-loket (Kasir, SPP, dan Kartu).
-Dibangun dengan **Laravel 10**, **Alpine.js**, dan **Tailwind CSS** untuk pengalaman UI yang ringan dan real-time.
+# 🏦 Antrian SBW
+
+### Sistem Antrian Real-Time untuk Layanan Bank Sampah
+
+[![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+Aplikasi berbasis web untuk mengelola sistem antrian nasabah **Bank Sampah**
+secara **real-time** dengan tampilan display modern, notifikasi, dan TTS otomatis.
+
+[Fitur](#-fitur-utama) • [Instalasi](#-instalasi) • [Screenshot](#-screenshot) • [Lisensi](#-lisensi)
+
+</div>
+
+---
+
+## 📖 Tentang Project
+
+**Antrian SBW** adalah aplikasi yang dirancang untuk melayani proses antrian
+nasabah Bank Sampah dengan:
+- Nomor antrian otomatis berdasarkan tipe layanan (SPP, Tunai, Tabungan)
+- Tampilan display real-time dengan Text-to-Speech (TTS)
+- Notifikasi popup untuk admin/operator
+- Multi-user authentication dengan role management
+
+---
+
+## ✨ Fitur Utama
+
+| Fitur | Deskripsi |
+|-------|-----------|
+| 🎫 **Manajemen Antrian** | Generate, panggil, dan selesaikan tiket antrian otomatis |
+| 📺 **Display Real-Time** | Tampilan display dengan polling 2 detik + TTS |
+| 🔔 **Notifikasi Popup** | Icon lonceng dengan badge & dropdown notifikasi |
+| 👥 **Multi-Role Auth** | Sistem autentikasi dengan role admin & operator |
+| 🎨 **UI Modern** | Responsive design dengan Tailwind CSS |
+| 📊 **Laporan** | Tracking tiket yang sudah selesai/lunas |
+
+---
+
+## 🚀 Tech Stack
+
+- **Backend**: Laravel 11+ (PHP 8.2+)
+- **Frontend**: Blade Templates + Alpine.js + Tailwind CSS
+- **Database**: MySQL / MariaDB
+- **Auth**: Laravel Breeze
+- **Real-Time**: Polling-based (no WebSocket required)
+
+---
+
+## 📦 Instalasi
+
+### Prasyarat
+Pastikan sudah terinstall:
+- PHP 8.2+
+- Composer
+- MySQL/MariaDB
+- Node.js & NPM
+
+### Langkah Instalasi
+
+1. **Clone repository**
+   ```bash
+   git clone https://github.com/username/antrian_sbw.git
+   cd antrian_sbw
+   ```
+
+2. **Install dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Setup environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Setup database**
+   - Buat database baru di MySQL
+   - Sesuaikan konfigurasi `.env` (lihat file `.env.example` untuk referensi)
+   ```bash
+   php artisan migrate --seed
+   ```
+
+5. **Build assets & jalankan server**
+   ```bash
+   npm run build
+   php artisan serve
+   ```
+
+6. **Akses aplikasi** di `http://localhost:8000`
+
+> 🔒 **Catatan Keamanan**: File `.env` berisi kredensial sensitif dan **tidak boleh**
+> di-commit ke repository publik. Gunakan `.env.example` sebagai template.
+
+---
+
+## 📸 Screenshot
+
+<div align="center">
+
+| Tampilan Display | Tampilan Manajemen Antrian |
+|:----------------:|:--------------------------:|
+| ![Display](display-screenshot.png) | Coming Soon |
+
+</div>
+
+---
+
+## 🛣️ Roadmap
+
+- [x] Sistem antrian real-time
+- [x] Tampilan display dengan TTS
+- [x] Notifikasi popup
+- [ ] Dashboard analytics untuk admin
+- [ ] Export laporan ke PDF/Excel
+- [ ] Multi-language support (ID/EN)
+
+---
+
+## 🤝 Kontribusi
+
+Kontribusi sangat diterima! Silakan:
+1. Fork repository ini
+2. Buat branch fitur (`git checkout -b feature/AmazingFeature`)
+3. Commit perubahan (`git commit -m 'Add some AmazingFeature'`)
+4. Push ke branch (`git push origin feature/AmazingFeature`)
+5. Buat Pull Request
+
+---
+
+## 📄 Lisensi
+
+Project ini open-source di bawah lisensi MIT. Anda bebas menggunakan, memodifikasi, dan mendistribusikan dengan menyertakan kredit pembuat.
+
+---
+
+<div align="center">
+
+**Dibuat dengan ❤️ untuk Bank Sampah**
+
+⭐ Jangan lupa beri star jika project ini bermanfaat!
+
+</div>
 
 ---
 
