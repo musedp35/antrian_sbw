@@ -19,6 +19,9 @@ use App\Http\Controllers\SettingController;
 // Public settings API endpoint (used by display page for TTS, refresh rate, etc.)
 Route::get('/settings', [SettingController::class, 'apiIndex'])->name('api.settings.index');
 
+// Public list of available video files di folder public/videos (untuk admin UI auto-detect)
+Route::get('/videos/available', [SettingController::class, 'listVideosApi'])->name('api.videos.available');
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();

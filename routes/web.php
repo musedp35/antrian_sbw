@@ -79,6 +79,10 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])->group(function () {
     Route::resource('users', UserController::class)->except(['show']);
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::patch('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // Video playlist management
+    Route::post('/settings/videos/upload', [SettingController::class, 'uploadVideo'])->name('settings.videos.upload');
+    Route::delete('/settings/videos/delete', [SettingController::class, 'deleteVideo'])->name('settings.videos.delete');
 });
 
 require __DIR__.'/auth.php';

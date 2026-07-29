@@ -10,7 +10,7 @@ class VoiceService
      * Text-to-Speech menggunakan Web Speech API (browser-side).
      * Pada sisi server ini menghasilkan teks yang akan diparsing oleh browser client.
      */
-    public function generateTextForTTS(string $ticketNumber, string $type): string
+    public function generateTextForTTS(string $ticketNumber, string $type, ?string $loket = null): string
     {
         $readableNumber = $this->readableNumber($ticketNumber);
         $typeLabel = match ($type) {
@@ -20,7 +20,20 @@ class VoiceService
             default => $type,
         };
 
-        return "Nomor antrian {$readableNumber}, silakan menuju loket {$typeLabel}";
+        // Default loket by type jika belum di-set
+        $loketLabel = $loket ?: match ($type) {
+            'spp'      => 'Loket SPP',
+            'tunai'    => 'Loket Tunai',
+            'tabungan' => 'Loket Tabungan',
+            default    => 'Loket',
+        };
+
+        // Ubah "Loket SPP" → "Loket S P P" supaya TTS mengucapkan setiap huruf
+        $loketSpoken = preg_replace_callback('/\b[A-Z]{2,}\b/', function ($m) {
+            return implode(' ', str_split($m[0]));
+        }, $loketLabel);
+
+        return "Nomor antrian {$readableNumber}, silakan menuju {$loketSpoken}";
     }
 
     /**

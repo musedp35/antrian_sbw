@@ -26,6 +26,22 @@ class DisplayApiController extends Controller
             ->take(20)
             ->get();
 
+        // === Statistik untuk display (tambahan) ===
+        $statsWaiting = Ticket::where('status', 'waiting')
+            ->whereDate('created_at', $today)
+            ->count();
+
+        $statsSelesai = Ticket::where('status', 'done')
+            ->whereDate('created_at', $today)
+            ->count();
+
+        $statsTotal = Ticket::whereDate('created_at', $today)
+            ->count();
+
+        // Estimasi waktu tunggu: rata-rata 5 menit per tiket (heuristic)
+        // Bisa disesuaikan dengan konfigurasi dari settings nanti
+        $estimasiMenit = $statsWaiting * 5;
+
         return response()->json([
             'called' => $called ? [
                 'id'            => $called->id,
@@ -37,6 +53,7 @@ class DisplayApiController extends Controller
                     'tabungan' => 'Tabungan',
                     default => ucfirst($called->type),
                 },
+                'loket'         => $called->loket,
                 // Penting: updated_at digunakan display untuk deteksi recall
                 // (recall tidak ubah id, hanya touch updated_at)
                 'updated_at'    => $called->updated_at->toIso8601String(),
@@ -51,8 +68,16 @@ class DisplayApiController extends Controller
                     'tabungan' => 'Tabungan',
                     default => ucfirst($t->type),
                 },
+                'loket'         => $t->loket,
                 'created_at'    => $t->created_at->toIso8601String(),
             ]),
+            // === Statistik ===
+            'stats' => [
+                'waiting'        => $statsWaiting,
+                'selesai'        => $statsSelesai,
+                'total'          => $statsTotal,
+                'estimasi_menit' => $estimasiMenit,
+            ],
         ]);
     }
 }

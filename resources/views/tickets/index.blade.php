@@ -62,12 +62,21 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2 border-l border-gray-300">
                                         @if($ticket->status === 'waiting')
+                                        <select data-loket-select="{{ $ticket->id }}"
+                                            class="text-xs border border-gray-300 rounded px-1 py-1 mr-1"
+                                            title="Pilih loket tujuan">
+                                            @foreach(\App\Models\Ticket::LOKETS as $loketOption)
+                                                <option value="{{ $loketOption }}" {{ $ticket->loket === $loketOption ? 'selected' : '' }}>
+                                                    {{ $loketOption }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                         <button type="button"
                                             data-action="call"
                                             data-ticket-id="{{ $ticket->id }}"
                                             data-call-url="{{ route('tickets.call', $ticket) }}"
                                             class="text-white bg-yellow-500 hover:bg-yellow-600 px-2 py-1 rounded text-xs">
-                                            Panggil
+                                            🔊 Panggil
                                         </button>
                                         @elseif($ticket->status === 'called')
                                         <button type="button"
@@ -75,7 +84,7 @@
                                             data-ticket-id="{{ $ticket->id }}"
                                             data-recall-url="{{ route('tickets.recall', $ticket) }}"
                                             class="text-white bg-orange-500 hover:bg-orange-600 px-2 py-1 rounded text-xs"
-                                            title="Panggil ulang tiket ini">
+                                            title="Panggil ulang tiket ini (loket tersimpan: {{ $ticket->loket ?? 'default' }})">
                                             🔊 Panggil Ulang
                                         </button>
                                         <button type="button"
@@ -161,11 +170,21 @@
                 const action = this.dataset.action;
                 const ticketId = this.dataset.ticketId;
                 let url, method;
+                let selectedLoket = null;
 
                 switch(action) {
-                    case 'call':
+                    case 'call': {
                         url = this.dataset.callUrl;
+                        // Cari dropdown loket di row yang sama (parent tr)
+                        const row = this.closest('tr');
+                        const loketSelect = row ? row.querySelector('[data-loket-select]') : null;
+                        selectedLoket = loketSelect ? loketSelect.value : null;
+                        // Konfirmasi sebelum panggil
+                        if (selectedLoket && !confirm(`Panggil tiket ke ${selectedLoket}?`)) {
+                            return;
+                        }
                         break;
+                    }
                     case 'recall':
                         url = this.dataset.recallUrl;
                         break;
@@ -186,6 +205,9 @@
                             'X-CSRF-TOKEN': csrfToken,
                             'Accept': 'application/json',
                         },
+                        body: JSON.stringify({
+                            loket: selectedLoket || null,
+                        }),
                     });
 
                     const data = await response.json();

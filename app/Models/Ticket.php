@@ -16,11 +16,22 @@ class Ticket extends Model
         'type',
         'status',
         'assigned_cashier_id',
+        'loket',
     ];
 
     protected $casts = [
         'type' => 'string',
         'status' => 'string',
+        'loket' => 'string',
+    ];
+
+    /**
+     * Daftar loket yang tersedia.
+     */
+    public const LOKETS = [
+        'Loket SPP',
+        'Loket Tunai',
+        'Loket Tabungan',
     ];
 
     /**

@@ -85,11 +85,20 @@ class TicketController extends Controller
         $type = $validated['type'];
         $ticketNumber = Ticket::generateTicketNumber($type);
 
+        // Otomatis set loket default sesuai type tiket
+        $defaultLoket = match ($type) {
+            'spp'      => 'Loket SPP',
+            'tunai'    => 'Loket Tunai',
+            'tabungan' => 'Loket Tabungan',
+            default    => null,
+        };
+
         $ticket = Ticket::create([
             'ticket_number' => $ticketNumber,
             'type'          => $type,
             'status'        => 'waiting',
             'assigned_cashier_id' => auth()->id(),
+            'loket'         => $defaultLoket,
         ]);
 
         // Broadcast notification for new ticket creation
@@ -120,7 +129,7 @@ class TicketController extends Controller
      * Call the ticket (change status to 'called').
      * Returns JSON response with TTS text for frontend playback.
      */
-    public function callAjax(string $id)
+    public function callAjax(string $id, Request $request)
     {
         $ticket = Ticket::findOrFail($id);
 
@@ -131,15 +140,30 @@ class TicketController extends Controller
             ], 400);
         }
 
+        // Ambil param loket dari request, fallback ke loket yang sudah ada di ticket, lalu default by type
+        $requestedLoket = $request->input('loket');
+        if ($requestedLoket && in_array($requestedLoket, Ticket::LOKETS, true)) {
+            $loket = $requestedLoket;
+        } else {
+            $loket = $ticket->loket ?? match ($ticket->type) {
+                'spp'      => 'Loket SPP',
+                'tunai'    => 'Loket Tunai',
+                'tabungan' => 'Loket Tabungan',
+                default    => null,
+            };
+        }
+
         $ttsText = $this->voiceService->generateTextForTTS(
             $ticket->ticket_number,
-            $ticket->type
+            $ticket->type,
+            $loket
         );
 
-        DB::transaction(function () use ($ticket) {
+        DB::transaction(function () use ($ticket, $loket) {
             $ticket->update([
                 'status'            => 'called',
                 'assigned_cashier_id' => auth()->id(),
+                'loket'             => $loket,
             ]);
 
             CallLog::create([
@@ -160,6 +184,7 @@ class TicketController extends Controller
                 'type'            => $ticket->type,
                 'status'          => 'called',
                 'assigned_cashier_id' => auth()->id(),
+                'loket'           => $loket,
             ],
             'tts_text' => $ttsText,
         ]);
@@ -198,10 +223,19 @@ class TicketController extends Controller
             ], 400);
         }
 
+        // Pakai loket yang tersimpan di ticket
+        $loket = $ticket->loket ?? match ($ticket->type) {
+            'spp'      => 'Loket SPP',
+            'tunai'    => 'Loket Tunai',
+            'tabungan' => 'Loket Tabungan',
+            default    => null,
+        };
+
         // Generate ulang TTS text
         $ttsText = $this->voiceService->generateTextForTTS(
             $ticket->ticket_number,
-            $ticket->type
+            $ticket->type,
+            $loket
         );
 
         // Catat ke CallLog sebagai history pemanggilan ulang
@@ -222,6 +256,7 @@ class TicketController extends Controller
                 'ticket_number'   => $ticket->ticket_number,
                 'type'            => $ticket->type,
                 'status'          => $ticket->status,
+                'loket'           => $loket,
             ],
             'tts_text' => $ttsText,
         ]);
@@ -277,15 +312,24 @@ class TicketController extends Controller
     {
         $ticket = Ticket::findOrFail($id);
 
+        $loket = $ticket->loket ?? match ($ticket->type) {
+            'spp'      => 'Loket SPP',
+            'tunai'    => 'Loket Tunai',
+            'tabungan' => 'Loket Tabungan',
+            default    => null,
+        };
+
         $text = $this->voiceService->generateTextForTTS(
             $ticket->ticket_number,
-            $ticket->type
+            $ticket->type,
+            $loket
         );
 
         return response()->json([
             'text'  => $text,
             'lang'  => 'id-ID',
             'voice' => 'Google Bahasa Indonesia',
+            'loket' => $loket,
         ]);
     }
 }

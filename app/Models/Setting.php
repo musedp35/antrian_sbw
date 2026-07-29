@@ -16,7 +16,13 @@ class Setting extends Model
     ];
 
     /**
-     * Get setting value by key.
+     * Get setting value by key (with type-aware casting).
+     *
+     * Supported types:
+     * - 'boolean' → bool
+     * - 'number'  → int
+     * - 'json'    → array (auto-decoded)
+     * - 'string'  → string (default)
      */
     public static function getValue(string $key, mixed $default = null): mixed
     {
@@ -26,12 +32,13 @@ class Setting extends Model
         return match ($setting->type) {
             'number'  => (int) $setting->value,
             'boolean' => filter_var($setting->value, FILTER_VALIDATE_BOOLEAN),
+            'json'    => json_decode($setting->value ?? '[]', true) ?? [],
             default   => $setting->value,
         };
     }
 
     /**
-     * Set setting value by key.
+     * Set setting value by key (auto-detect type).
      */
     public static function setValue(string $key, mixed $value): void
     {
