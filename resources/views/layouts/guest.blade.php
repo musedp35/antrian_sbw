@@ -16,10 +16,13 @@
     </head>
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
+            <div class="text-center">
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    <img src="{{ asset('images/logos/Logo_Sbw.png') }}" alt="Logo SBW" class="w-28 h-28 mx-auto">
                 </a>
+                <h1 class="mt-3 text-3xl md:text-4xl font-bold text-gray-800">
+                    {{ config('app.name', 'Antrian SBW') }}
+                </h1>
             </div>
 
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
