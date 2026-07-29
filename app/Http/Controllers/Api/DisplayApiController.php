@@ -10,13 +10,20 @@ class DisplayApiController extends Controller
 {
     public function index()
     {
+        // Dapatkan tanggal hari ini dalam format Y-m-d (untuk filter)
+        $today = now()->format('Y-m-d');
+
+        // Called ticket — hanya untuk tiket hari ini (terupdate terakhir)
         $called = Ticket::where('status', 'called')
+            ->whereDate('created_at', $today)  // FILTER: hari ini saja
             ->orderByDesc('updated_at')
             ->first();
 
+        // Waiting tickets — hanya untuk tiket hari ini, diurutkan berdasarkan waktu tunggu terbanyak
         $waiting = Ticket::where('status', 'waiting')
+            ->whereDate('created_at', $today)  // FILTER: hari ini saja
             ->orderBy('created_at', 'asc')
-            ->take(9)
+            ->take(20)
             ->get();
 
         return response()->json([
@@ -44,6 +51,7 @@ class DisplayApiController extends Controller
                     'tabungan' => 'Tabungan',
                     default => ucfirst($t->type),
                 },
+                'created_at'    => $t->created_at->toIso8601String(),
             ]),
         ]);
     }

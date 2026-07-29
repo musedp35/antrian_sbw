@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Visualisasi Display Antrian - Desktop 100%</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { font-family: system-ui, sans-serif; background: #f8fafc; }
+.frame { background: white; border: 2px solid #cbd5e1; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); position: relative; }
+.annotation { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 16px 0; border-radius: 6px; font-size: 14px; color: #78350f; }
+.annotation.danger { background: #fee2e2; border-left-color: #ef4444; color: #7f1d1d; }
+.annotation.success { background: #d1fae5; border-left-color: #10b981; color: #064e3b; }
+.annotation.info { background: #dbeafe; border-left-color: #3b82f6; color: #1e3a8a; }
+.called-pulse { animation: pulse-called 1.5s ease-in-out infinite; }
+@keyframes pulse-called { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+.video-area { aspect-ratio: 16/9; }
+</style>
+</head>
+<body class="p-6">
+<div class="max-w-7xl mx-auto">
+<h1 class="text-3xl font-bold text-slate-800 mb-2">Visualisasi Tampilan Display Antrian</h1>
+<p class="text-slate-600 mb-4">Resolusi: Desktop 100% (1280px ke atas) - Mode utama untuk TV/Layar besar kantor</p>
+
+<div class="annotation info">
+<strong>Skenario 1:</strong> Tampilan utama saat video play dan ada tiket yang sedang dipanggil. Ini adalah kondisi paling umum di ruang tunggu.
+</div>
+
+<div class="frame mb-8">
+
+<header class="flex flex-col items-center justify-center p-4 border-b">
+<div class="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-2"><span class="text-3xl">[LOGO]</span></div>
+<h3 class="text-slate-500 text-base">Koperasi Setia Bhakti Wanita</h3>
+<h1 class="text-5xl font-extrabold text-slate-800">Display Antrian</h1>
+</header>
+
+<main class="flex flex-row gap-6 p-6">
+
+<section class="video-area relative rounded-2xl overflow-hidden border-8 border-slate-900 shadow-xl bg-black flex items-center justify-center" style="width: 66.666667%;">
+<div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-900 to-blue-900">
+<div class="text-white text-center"><div class="text-6xl mb-3">[VIDEO]</div><p class="font-bold">VIDEO TOKOKU SBW</p><p class="text-xs opacity-70">mp4 autoplay loop</p></div>
+</div>
+<div class="absolute bottom-3 right-3 bg-black/80 text-white px-2 py-1 text-xs font-bold rounded">14:35:22</div>
+</section>
+
+<section class="bg-slate-100 rounded-2xl shadow-md p-8 flex flex-col items-center justify-center border border-slate-200" style="width: 33.333333%;">
+<h2 class="text-xl font-bold text-slate-500 mb-6 tracking-wide">SEDANG DIPANGGIL</h2>
+<div class="called-pulse w-full bg-blue-600 rounded-2xl shadow-lg py-14 flex items-center justify-center">
+<div class="text-center px-2">
+<div class="text-5xl font-extrabold text-white drop-shadow-md">SPP-005</div>
+<div class="text-lg text-white/90 mt-2 font-semibold">SPP</div>
+</div>
+</div>
+</section>
+</main>
+
+<footer class="px-6 pb-6">
+<div class="bg-slate-50 rounded-t-xl px-6 py-4 flex justify-between items-center mb-4">
+<h3 class="text-2xl font-bold text-slate-800">Daftar Antrian :</h3>
+<span class="bg-white border border-slate-200 text-slate-600 text-sm font-semibold px-4 py-1.5 rounded-full shadow-sm"><span class="text-orange-500 font-bold">5</span> tiket</span>
+</div>
+<div class="flex flex-row gap-4 w-full">
+<div class="bg-white border border-slate-200 rounded-lg p-3 flex-1 text-center"><div class="text-lg font-bold text-blue-600">SPP-001</div><div class="text-xs text-slate-500">SPP</div></div>
+<div class="bg-white border border-slate-200 rounded-lg p-3 flex-1 text-center"><div class="text-lg font-bold text-purple-600">T-002</div><div class="text-xs text-slate-500">Tunai</div></div>
+<div class="bg-white border border-slate-200 rounded-lg p-3 flex-1 text-center"><div class="text-lg font-bold text-teal-600">TB-003</div><div class="text-xs text-slate-500">Tabungan</div></div>
+<div class="bg-white border border-slate-200 rounded-lg p-3 flex-1 text-center"><div class="text-lg font-bold text-blue-600">SPP-004</div><div class="text-xs text-slate-500">SPP</div></div>
+<div class="bg-white border border-slate-200 rounded-lg p-3 flex-1 text-center"><div class="text-lg font-bold text-purple-600">T-006</div><div class="text-xs text-slate-500">Tunai</div></div>
+</div>
+</footer>
+
+<div class="absolute bottom-6 right-6 bg-white rounded-full border border-gray-200 shadow-md px-4 py-2 flex items-center gap-3">
+<span class="text-gray-600 font-mono text-base px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">14:35:22</span>
+<button class="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 rounded-full border border-gray-200">
+<span>[AUDIO]</span><span class="text-sm">Audio</span>
+</button>
+</div>
+
+</div>
+
+<div class="mt-8">
+<h2 class="text-2xl font-bold text-slate-800 mb-4">Analisa Permasalahan Tampilan Desktop 100%</h2>
+
+<div class="annotation danger">
+<strong>MASALAH 1 - Floating Control Menghalangi Waiting List</strong><br>
+Posisi fixed bottom-6 right-6 membuat tombol jam & audio mengambang di atas daftar antrian.
+<strong>Dampak:</strong> User tidak bisa lihat tiket terakhir karena tertutup floating control.
+</div>
+
+<div class="annotation danger">
+<strong>MASALAH 2 - Clockcorner di Video Mengganggu</strong><br>
+Jam kecil di pojok kanan bawah video. <strong>Dampak:</strong> Jika video memiliki konten penting di area tersebut, tertutup jam.
+</div>
+
+<div class="annotation danger">
+<strong>MASALAH 3 - Sedang Dipanggil Hanya Tampilkan 1 Tiket</strong><br>
+Hanya menampilkan SATU nomor antrian, padahal untuk multi-loket idealnya menampilkan 2-3 tiket sekaligus (Loket 1, 2, 3).
+<strong>Dampak:</strong> User yang mengantri di loket lain tidak tahu status mereka.
+</div>
+
+<div class="annotation">
+<strong>MASALAH 4 - Fitur yang Seharusnya Tampil di Desktop Tapi Tidak Ada:</strong>
+<ul class="mt-2 ml-4 list-disc">
+<li>Running text / marquee untuk promo atau pengumuman</li>
+<li>Jam dan tanggal lengkap (hanya jam saja saat ini)</li>
+<li>Statistik antrian (misal: 5 menunggu, 23 selesai hari ini)</li>
+<li>Jumlah loket aktif</li>
+<li>Estimasi waktu tunggu</li>
+<li>Logo sponsor / partner</li>
+</ul>
+</div>
+
+<div class="annotation danger">
+<strong>MASALAH 5 - Waiting List Hanya 5 Tiket Terlihat</strong><br>
+CSS flex-row tanpa flex-wrap. Item menunggu lebih dari 5 akan overflow horizontal.
+<strong>Dampak:</strong> User tidak tahu ada tiket lain di urutan berikutnya.
+</div>
+
+<div class="annotation info">
+<strong>MASALAH 6 - Header Terlalu Sederhana:</strong>
+<ul class="mt-2 ml-4 list-disc">
+<li>Tidak ada tanggal hari ini</li>
+<li>Tidak ada info cabang / alamat</li>
+<li>Tidak ada running text pengumuman</li>
+</ul>
+</div>
+
+<div class="annotation success">
+<strong>Yang Sudah Baik:</strong>
+<ul class="mt-2 ml-4 list-disc">
+<li>Layout responsif: video 66.67% + called 33.33% proporsional</li>
+<li>Animasi pulse pada tiket yang sedang dipanggil menarik perhatian</li>
+<li>Logo responsif: 64px (mobile) ke 80px (tablet) ke 96px (desktop)</li>
+<li>Fallback Tailwind untuk sm:/md: classes sudah lengkap</li>
+<li>Audio ducking saat TTS sudah diimplementasikan</li>
+</ul>
+</div>
+</div>
+
+<div class="mt-12">
+<h2 class="text-2xl font-bold text-slate-800 mb-4">Rekomendasi Perbaikan</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500"><h3 class="font-bold">1. Pindahkan Floating Control</h3><p class="text-sm">Pindahkan dari fixed ke dalam header/topbar.</p></div>
+<div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500"><h3 class="font-bold">2. Multi-Loket Display</h3><p class="text-sm">Tampilkan 2-3 tiket sekaligus untuk loket berbeda.</p></div>
+<div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500"><h3 class="font-bold">3. Running Text/Marquee</h3><p class="text-sm">Tambahkan marquee untuk promo, pengumuman.</p></div>
+<div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500"><h3 class="font-bold">4. Statistik Antrian</h3><p class="text-sm">5 menunggu, 23 selesai hari ini, Estimasi 15 menit.</p></div>
+<div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500"><h3 class="font-bold">5. Tanggal & Jam Lengkap</h3><p class="text-sm">Selasa, 29 Juli 2026 di header.</p></div>
+<div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500"><h3 class="font-bold">6. Wrap Waiting List</h3><p class="text-sm">Gunakan flex-wrap agar tiket otomatis wrap ke baris baru.</p></div>
+</div>
+</div>
+
+</div>
+</body>
+</html>

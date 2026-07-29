@@ -16,6 +16,7 @@ class SettingController extends Controller
         $groups = [
             'tts' => ['title' => 'Konfigurasi Suara (TTS)', 'settings' => []],
             'display' => ['title' => 'Konfigurasi Display', 'settings' => []],
+            'video' => ['title' => 'Konfigurasi Video Display', 'settings' => []],
             'general' => ['title' => 'Konfigurasi Umum', 'settings' => []],
         ];
 
