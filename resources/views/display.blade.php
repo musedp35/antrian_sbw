@@ -381,7 +381,7 @@
             </div>
 
             {{-- (2) Running Text — di Sisi Kosong (tengah, fleksibel) --}}
-            <div id="marquee-container" class="flex-1 min-w-0 overflow-hidden bg-gradient-to-r from-slate-100 via-slate-200 to-slate-300 rounded-md border border-white shadow-sm relative mx-2 h-8 flex items-center" data-visible="false">
+            <div id="marquee-container" class="flex-1 min-w-0 overflow-hidden bg-gradient-to-r from-slate-100 via-slate-200 to-slate-200 rounded-md border border-white shadow-sm relative mx-2 h-8 flex items-center" data-visible="false">
                 <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-xs sm:text-sm z-10 text-blue-900 px-1.5 py-0.5 rounded font-bold">📢</span>
                 <div class="overflow-hidden ml-8 sm:ml-9 w-full">
                     <div id="marquee-content" class="marquee-scroll whitespace-nowrap text-sm sm:text-base font-extrabold leading-8 tracking-wide" style="color: #e99300;">
