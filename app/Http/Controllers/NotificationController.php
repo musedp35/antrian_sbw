@@ -62,11 +62,19 @@ class NotificationController extends Controller
             ->take(5)
             ->get();
 
-        // Mapping icon berdasarkan tipe tiket
+        // Mapping icon berdasarkan tipe notifikasi
         $iconMap = [
+            // Tipe tiket antrian
             'spp' => '🎫',      // Tiket SPP
             'tunai' => '💵',    // Tiket Tunai
             'tabungan' => '🏦', // Tiket Tabungan
+            // Tipe sistem
+            'setting_updated' => '⚙️', // Pengaturan diperbarui
+            'member_new' => '👤',      // Member baru
+            'loket_opened' => '🟢',    // Loket dibuka
+            'loket_closed' => '🔴',    // Loket ditutup
+            // Default
+            'default' => '🔔',
         ];
 
         // Mapping label tipe tiket ke nama lengkap
@@ -81,18 +89,23 @@ class NotificationController extends Controller
             $type = $data['type'] ?? null;
             $ticketNumber = $data['ticket_number'] ?? null;
 
-            // Tentukan icon berdasarkan tipe tiket
-            $icon = $iconMap[$type] ?? '🔔';
+            // Tentukan icon berdasarkan tipe notifikasi
+            $icon = $iconMap[$type] ?? $iconMap['default'];
 
-            // Tentukan title
-            $title = $ticketNumber
-                ? 'Tiket Baru: ' . $ticketNumber
-                : 'Notifikasi Baru';
-
-            // Format message dengan type label
-            $message = $type
-                ? 'Tipe: ' . ($typeLabelMap[$type] ?? ucfirst($type)) . ', ' . ($data['created_at'] ?? '')
-                : '';
+            // Tentukan title dan message berdasarkan tipe
+            if (isset($data['title'])) {
+                // Notifikasi sistem (SystemNotification)
+                $title = $data['title'];
+                $message = $data['description'] ?? '';
+            } else {
+                // Notifikasi tiket (NewTicketNotification)
+                $title = $ticketNumber
+                    ? 'Tiket Baru: ' . $ticketNumber
+                    : 'Notifikasi Baru';
+                $message = $type
+                    ? 'Tipe: ' . ($typeLabelMap[$type] ?? ucfirst($type)) . ', ' . ($data['created_at'] ?? '')
+                    : '';
+            }
 
             return [
                 'id' => $notification->id,

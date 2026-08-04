@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
+use App\Models\User;
+use App\Notifications\SystemNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -202,6 +204,9 @@ class SettingController extends Controller
 
             // Clear config cache so changes take effect
             \Illuminate\Support\Facades\Artisan::call('config:clear');
+
+            // Broadcast notifikasi sistem ke semua admin (kecuali yang sedang update)
+            $this->broadcastSettingUpdated($existingSettings, $validated);
 
             session()->flash('success', 'Pengaturan berhasil disimpan.');
         } catch (\Exception $e) {
@@ -478,6 +483,60 @@ class SettingController extends Controller
         $units = ['B', 'KB', 'MB', 'GB'];
         $i = (int) floor(log($bytes, 1024));
         return round($bytes / pow(1024, $i), 2) . ' ' . $units[$i];
+    }
+
+    /**
+     * Broadcast notifikasi sistem ke semua admin (kecuali yang mengubah).
+     *
+     * Dipanggil setelah setting berhasil di-update (commit berhasil).
+     * Format data untuk popup lonceng: type, title, description, changed_by, created_at.
+     */
+    private function broadcastSettingUpdated($existingSettings, array $validated): void
+    {
+        // Kumpulkan key yang berubah (tidak termasuk JSON yang nilainya sama)
+        $changedKeys = [];
+        foreach ($validated['settings'] ?? [] as $item) {
+            $key = $item['key'];
+            $setting = $existingSettings[$key] ?? null;
+            if (!$setting) continue;
+            // Skip kalau tipe json (sudah dipisah handler)
+            if ($setting->type === 'json') continue;
+            // Skip kalau value kosong dan currentVal bukan boolean
+            if (empty($item['value'])) continue;
+            $changedKeys[] = $key;
+        }
+
+        // Untuk JSON settings (seperti video_playlist), anggap berubah jika ada
+        $changedJsonKeys = array_keys($validated['settings_json'] ?? []);
+        $totalChanged = count($changedKeys) + count($changedJsonKeys);
+
+        if ($totalChanged === 0) {
+            return; // Tidak ada perubahan, skip notification
+        }
+
+        // Deskripsi yang lebih informatif
+        $description = $totalChanged === 1
+            ? 'Pengaturan "' . ($changedKeys[0] ?? $changedJsonKeys[0]) . '" diperbarui'
+            : $totalChanged . ' pengaturan diperbarui';
+
+        // User yang sedang login (yg update)
+        $changedBy = auth()->user()->name ?? 'System';
+
+        // Kirim notifikasi ke semua admin kecuali yang update
+        $currentUserId = auth()->id();
+        $adminUsers = User::whereNotNull('role')
+            ->where('id', '!=', $currentUserId)
+            ->get();
+
+        foreach ($adminUsers as $user) {
+            $user->notify(new SystemNotification([
+                'type'        => 'setting_updated',
+                'title'       => 'Pengaturan Diperbarui',
+                'description' => $description,
+                'changed_by'  => $changedBy,
+                'created_at'  => now()->format('d/m/Y H:i'),
+            ]));
+        }
     }
 
     /**
