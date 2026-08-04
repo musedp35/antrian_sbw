@@ -84,11 +84,14 @@
                                     </div>
                                     <div x-show="!isLoading && notifications.length > 0" class="space-y-1 px-2">
                                         <template x-for="(notification, index) in notifications" :key="index">
-                                            <div class="p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
-                                                <div class="font-medium text-sm text-gray-800" x-text="notification.title"></div>
-                                                <div class="text-xs text-gray-600 mt-1" x-text="notification.message"></div>
-                                                <div class="text-xs text-gray-400 mt-1">
-                                                    ⏱ <span x-text="new Date(notification.created_at).toLocaleString('id-ID')"></span>
+                                            <div class="flex items-start p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                                                <span class="text-2xl mr-3 flex-shrink-0" x-text="notification.icon || '🔔'"></span>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-medium text-sm text-gray-800" x-text="notification.title"></div>
+                                                    <div class="text-xs text-gray-600 mt-1" x-text="notification.message"></div>
+                                                    <div class="text-xs text-gray-400 mt-1">
+                                                        ⏱ <span x-text="new Date(notification.created_at).toLocaleString('id-ID')"></span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </template>

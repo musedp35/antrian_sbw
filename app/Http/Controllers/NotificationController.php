@@ -62,12 +62,43 @@ class NotificationController extends Controller
             ->take(5)
             ->get();
 
-        return response()->json($notifications->map(function ($notification) {
+        // Mapping icon berdasarkan tipe tiket
+        $iconMap = [
+            'spp' => '🎫',      // Tiket SPP
+            'tunai' => '💵',    // Tiket Tunai
+            'tabungan' => '🏦', // Tiket Tabungan
+        ];
+
+        // Mapping label tipe tiket ke nama lengkap
+        $typeLabelMap = [
+            'spp' => 'SPP',
+            'tunai' => 'Tunai',
+            'tabungan' => 'Tabungan',
+        ];
+
+        return response()->json($notifications->map(function ($notification) use ($iconMap, $typeLabelMap) {
             $data = $notification->data ?? [];
+            $type = $data['type'] ?? null;
+            $ticketNumber = $data['ticket_number'] ?? null;
+
+            // Tentukan icon berdasarkan tipe tiket
+            $icon = $iconMap[$type] ?? '🔔';
+
+            // Tentukan title
+            $title = $ticketNumber
+                ? 'Tiket Baru: ' . $ticketNumber
+                : 'Notifikasi Baru';
+
+            // Format message dengan type label
+            $message = $type
+                ? 'Tipe: ' . ($typeLabelMap[$type] ?? ucfirst($type)) . ', ' . ($data['created_at'] ?? '')
+                : '';
+
             return [
                 'id' => $notification->id,
-                'title' => isset($data['ticket_number']) ? 'Tiket Baru: ' . $data['ticket_number'] : 'Notifikasi Baru',
-                'message' => isset($data['type']) ? 'Tipe: ' . $data['type'] . ', ' . ($data['created_at'] ?? '') : '',
+                'icon' => $icon,
+                'title' => $title,
+                'message' => $message,
                 'created_at' => $notification->created_at,
             ];
         }));
