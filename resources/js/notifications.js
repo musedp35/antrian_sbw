@@ -10,6 +10,7 @@ Alpine.data('notificationBell', () => ({
 
     init() {
         console.log('[Notification Bell] Alpine component initialized');
+        console.log('[Notification Bell] Routes:', window.notificationRoutes);
         this.startUnreadInterval();
         this.loadUnreadCount();
     },
@@ -20,17 +21,36 @@ Alpine.data('notificationBell', () => ({
             return;
         }
         this.fetchNotifications(window.notificationRoutes.unreadCount)
-            .then(data => { this.unreadCount = data.count || 0; })
-            .catch(e => { this.unreadCount = 0; });
+            .then(data => {
+                console.log('[Bell] Unread count:', data);
+                this.unreadCount = data.count || 0;
+            })
+            .catch(e => {
+                console.error('[Bell] Unread count error:', e);
+                this.unreadCount = 0;
+            });
     },
 
     loadNotifications() {
-        if (!this.showPopup || this.isLoading) return;
-        if (!window.notificationRoutes || !window.notificationRoutes.recent) return;
+        console.log('[Bell] loadNotifications called, showPopup=', this.showPopup);
+        if (!this.showPopup || this.isLoading) {
+            console.log('[Bell] Skipping: showPopup or isLoading false');
+            return;
+        }
+        if (!window.notificationRoutes || !window.notificationRoutes.recent) {
+            console.log('[Bell] Skipping: no routes');
+            return;
+        }
         this.isLoading = true;
         this.fetchNotifications(window.notificationRoutes.recent)
-            .then(data => { this.notifications = Array.isArray(data) ? data : []; })
-            .catch(() => { this.notifications = []; })
+            .then(data => {
+                console.log('[Bell] Got data:', data);
+                this.notifications = Array.isArray(data) ? data : [];
+            })
+            .catch(e => {
+                console.error('[Bell] Fetch error:', e);
+                this.notifications = [];
+            })
             .finally(() => { this.isLoading = false; });
     },
 
@@ -49,6 +69,13 @@ Alpine.data('notificationBell', () => ({
     startUnreadInterval() {
         if (this.unreadInterval) clearInterval(this.unreadInterval);
         this.unreadInterval = setInterval(() => this.loadUnreadCount(), 15000);
+    },
+
+    togglePopup() {
+        this.showPopup = !this.showPopup;
+        if (this.showPopup) {
+            this.loadNotifications();
+        }
     },
 
     closePopup() {

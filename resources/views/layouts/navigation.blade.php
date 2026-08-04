@@ -49,7 +49,7 @@
                         <!-- Notification Bell Container (Shared Alpine Component) -->
                         <div x-data="notificationBell" class="relative">
                             <!-- Notification Bell Button -->
-                            <button @click="showPopup = !showPopup; if (showPopup) loadNotifications()"
+                            <button @click="togglePopup()"
                                     @mousedown.stop
                                     @keyup.escape="closePopup()"
                                     type="button"
