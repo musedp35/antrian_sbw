@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\NewMemberNotification;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -46,6 +47,27 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // Broadcast notifikasi member baru ke semua admin
+        $this->broadcastNewMember($user);
+
         return redirect(RouteServiceProvider::HOME);
+    }
+
+    /**
+     * Broadcast notifikasi member baru ke semua admin (kecuali yang baru daftar).
+     */
+    private function broadcastNewMember(User $user): void
+    {
+        $adminUsers = User::whereNotNull('role')
+            ->where('id', '!=', $user->id)
+            ->get();
+
+        foreach ($adminUsers as $adminUser) {
+            $adminUser->notify(new NewMemberNotification([
+                'name'        => $user->name,
+                'email'       => $user->email,
+                'created_at'  => now()->format('d/m/Y H:i'),
+            ]));
+        }
     }
 }

@@ -93,7 +93,11 @@ class NotificationController extends Controller
             $icon = $iconMap[$type] ?? $iconMap['default'];
 
             // Tentukan title dan message berdasarkan tipe
-            if (isset($data['title'])) {
+            if ($type === 'member_new') {
+                // Notifikasi member baru (NewMemberNotification)
+                $title = 'Member Baru: ' . ($data['name'] ?? 'Member');
+                $message = $data['email'] ?? '';
+            } elseif (isset($data['title'])) {
                 // Notifikasi sistem (SystemNotification)
                 $title = $data['title'];
                 $message = $data['description'] ?? '';
