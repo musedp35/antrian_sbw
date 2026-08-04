@@ -72,7 +72,9 @@ Alpine.data('notificationBell', () => ({
     },
 
     togglePopup() {
+        console.log('[Bell] togglePopup called, current showPopup:', this.showPopup);
         this.showPopup = !this.showPopup;
+        console.log('[Bell] togglePopup done, new showPopup:', this.showPopup);
         if (this.showPopup) {
             this.loadNotifications();
         }
