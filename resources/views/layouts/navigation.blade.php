@@ -84,13 +84,18 @@
                                     </div>
                                     <div x-show="!isLoading && notifications.length > 0" class="space-y-1 px-2">
                                         <template x-for="(notification, index) in notifications" :key="index">
-                                            <div class="flex items-start p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                                            <div class="flex items-start p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                                                 :class="notification.is_read ? 'border-gray-100 bg-white opacity-75' : 'border-blue-200 bg-blue-50'">
                                                 <span class="text-2xl mr-3 flex-shrink-0" x-text="notification.icon || '🔔'"></span>
                                                 <div class="flex-1 min-w-0">
-                                                    <div class="font-medium text-sm text-gray-800" x-text="notification.title"></div>
-                                                    <div class="text-xs text-gray-600 mt-1" x-text="notification.message"></div>
+                                                    <div class="font-medium text-sm" :class="notification.is_read ? 'text-gray-600' : 'text-gray-900'" x-text="notification.title"></div>
+                                                    <div class="text-xs text-gray-500 mt-1" x-text="notification.message"></div>
                                                     <div class="text-xs text-gray-400 mt-1">
                                                         ⏱ <span x-text="new Date(notification.created_at).toLocaleString('id-ID')"></span>
+                                                        <!-- Unread label -->
+                                                        <span x-show="!notification.is_read" class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                            Baru
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>

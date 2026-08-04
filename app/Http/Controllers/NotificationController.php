@@ -54,13 +54,29 @@ class NotificationController extends Controller
 
     /**
      * Mendapatkan terbaru notifikasi untuk popup (terakhir 5 item).
+     *
+     * Strategi: Ambil 5 terbaru, lalu tambahkan unread prioritas di atas.
+     * Return field `is_read` agar frontend bisa kasih styling berbeda.
      */
     public function recent()
     {
-        $notifications = Auth::user()->notifications()
+        // Ambil 5 unread terbaru (prioritas)
+        $unread = Auth::user()->unreadNotifications()
             ->latest()
             ->take(5)
             ->get();
+
+        // Jika unread < 5, tambahkan read terbaru sampai 5
+        $notifications = $unread;
+        if ($notifications->count() < 5) {
+            $remaining = 5 - $notifications->count();
+            $read = Auth::user()->notifications()
+                ->whereNotNull('read_at')
+                ->latest()
+                ->take($remaining)
+                ->get();
+            $notifications = $notifications->merge($read)->sortByDesc('created_at')->take(5)->values();
+        }
 
         // Mapping icon berdasarkan tipe notifikasi
         $iconMap = [
@@ -112,11 +128,12 @@ class NotificationController extends Controller
             }
 
             return [
-                'id' => $notification->id,
-                'icon' => $icon,
-                'title' => $title,
-                'message' => $message,
+                'id'         => $notification->id,
+                'icon'       => $icon,
+                'title'      => $title,
+                'message'    => $message,
                 'created_at' => $notification->created_at,
+                'is_read'    => $notification->read_at !== null,
             ];
         }));
     }
