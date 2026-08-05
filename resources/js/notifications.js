@@ -32,26 +32,42 @@ Alpine.data('notificationBell', () => ({
     },
 
     loadNotifications() {
-        console.log('[Bell] loadNotifications called, showPopup=', this.showPopup);
-        if (!this.showPopup || this.isLoading) {
-            console.log('[Bell] Skipping: showPopup or isLoading false');
+        console.log('[Bell] loadNotifications() called');
+        console.log('[Bell] showPopup:', this.showPopup);
+        console.log('[Bell] isLoading:', this.isLoading);
+        console.log('[Bell] notificationRoutes:', window.notificationRoutes);
+
+        if (!this.showPopup) {
+            console.log('[Bell] Aborting: showPopup is false');
+            return;
+        }
+        if (this.isLoading) {
+            console.log('[Bell] Aborting: already loading');
             return;
         }
         if (!window.notificationRoutes || !window.notificationRoutes.recent) {
-            console.log('[Bell] Skipping: no routes');
+            console.error('[Bell] ERROR: notificationRoutes.recent not found');
+            console.error('[Bell] Routes:', window.notificationRoutes);
             return;
         }
+
+        console.log('[Bell] Fetching:', window.notificationRoutes.recent);
         this.isLoading = true;
         this.fetchNotifications(window.notificationRoutes.recent)
             .then(data => {
-                console.log('[Bell] Got data:', data);
+                console.log('[Bell] Response received:', data);
+                console.log('[Bell] Is array?', Array.isArray(data));
                 this.notifications = Array.isArray(data) ? data : [];
+                console.log('[Bell] Notifications set:', this.notifications.length);
             })
             .catch(e => {
                 console.error('[Bell] Fetch error:', e);
                 this.notifications = [];
             })
-            .finally(() => { this.isLoading = false; });
+            .finally(() => {
+                console.log('[Bell] Loading complete');
+                this.isLoading = false;
+            });
     },
 
     fetchNotifications(url) {
@@ -72,10 +88,20 @@ Alpine.data('notificationBell', () => ({
     },
 
     togglePopup() {
+        console.log('[Bell] togglePopup() called');
+        console.log('[Bell] Current showPopup:', this.showPopup);
         this.showPopup = !this.showPopup;
+        console.log('[Bell] New showPopup:', this.showPopup);
+
         if (this.showPopup) {
+            console.log('[Bell] Opening popup, loading notifications...');
             // Delay 100ms agar DOM selesai render popup baru
-            setTimeout(() => this.loadNotifications(), 100);
+            setTimeout(() => {
+                console.log('[Bell] setTimeout fired, calling loadNotifications()');
+                this.loadNotifications();
+            }, 100);
+        } else {
+            console.log('[Bell] Closing popup');
         }
     },
 
