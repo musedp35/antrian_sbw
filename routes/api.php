@@ -22,12 +22,8 @@ Route::get('/settings', [SettingController::class, 'apiIndex'])->name('api.setti
 // Public list of available video files di folder public/videos (untuk admin UI auto-detect)
 Route::get('/videos/available', [SettingController::class, 'listVideosApi'])->name('api.videos.available');
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-
-    // Notification Routes
+// Notification API Routes - menggunakan middleware web untuk session cookie auth
+Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/notifications/unread-count', [NotificationController::class, 'countUnread'])->name('api.notifications.unread-count');
     Route::get('/notifications/recent', [NotificationController::class, 'recent'])->name('api.notifications.recent');
     Route::get('/tickets/new', [NotificationController::class, 'getNewTickets'])->name('api.notifications.get-new-tickets');

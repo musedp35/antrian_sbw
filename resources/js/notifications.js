@@ -71,14 +71,43 @@ Alpine.data('notificationBell', () => ({
     },
 
     fetchNotifications(url) {
+        // Ambil CSRF token dari meta tag
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-        return fetch(url, {
-            headers: {'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
-            credentials: 'same-origin'
-        }).then(r => {
-            if (r.status === 401 || r.status === 403) throw new Error('Not authorized');
-            if (!r.ok) throw new Error('HTTP ' + r.status);
+
+        // Pastikan URL lengkap
+        const fullUrl = url.startsWith('http') ? url : window.location.origin + url;
+
+        console.log('[Bell] Fetching:', fullUrl);
+        console.log('[Bell] CSRF Token:', csrfToken ? 'Present' : 'Missing');
+
+        return fetch(fullUrl, {
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include', // WAJIB untuk kirim cookies
+            cache: 'no-cache'
+        })
+        .then(r => {
+            console.log('[Bell] Response status:', r.status);
+            console.log('[Bell] Response headers:', Object.fromEntries(r.headers.entries()));
+
+            if (r.status === 401 || r.status === 403) {
+                console.error('[Bell] AUTH ERROR: Session tidak valid');
+                throw new Error('Not authorized - session expired');
+            }
+            if (!r.ok) {
+                throw new Error('HTTP ' + r.status + ' ' + r.statusText);
+            }
             return r.json();
+        })
+        .catch(e => {
+            console.error('[Bell] Fetch error:', e.message);
+            console.error('[Bell] Full error:', e);
+            throw e;
         });
     },
 

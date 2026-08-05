@@ -70,8 +70,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
-    Route::get('/api/notifications/unread-count', [NotificationController::class, 'countUnread'])->name('api.notifications.unread-count');
-    Route::get('/api/tickets/new', [NotificationController::class, 'getNewTickets'])->name('api.notifications.get-new-tickets');
 });
 
 // Super Admin only — route grup untuk manajemen user & konfigurasi
@@ -86,3 +84,10 @@ Route::middleware(['auth', 'verified', 'role:super_admin'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Notification API Routes (web middleware - session based auth)
+Route::middleware(['web', 'auth'])->prefix('api/notifications')->group(function () {
+    Route::get('/unread-count', [App\Http\Controllers\NotificationController::class, 'countUnread'])->name('api.notifications.unread-count');
+    Route::get('/recent', [App\Http\Controllers\NotificationController::class, 'recent'])->name('api.notifications.recent');
+    Route::get('/tickets/new', [App\Http\Controllers\NotificationController::class, 'getNewTickets'])->name('api.notifications.get-new-tickets');
+});
