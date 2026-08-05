@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100 leading-tight">
+        <h2 class="font-bold text-xl text-gray-900 leading-tight">
             {{ __('Notifikasi') }}
         </h2>
     </x-slot>
@@ -17,8 +17,8 @@
             @endif
 
             <!-- Group Actions -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-4 border-b border-gray-100 dark:border-gray-700">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-4 border-b border-gray-100">
                     <div class="flex flex-wrap gap-2">
                         <form method="POST" action="{{ route('notifications.delete-read') }}"
                               onsubmit="return confirm('Hapus semua notifikasi yang sudah dibaca?')"
@@ -48,7 +48,7 @@
             </div>
 
             <!-- Notification List -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="space-y-3">
                         @forelse($notifications as $notification)
@@ -108,7 +108,7 @@
                                     </div>
 
                                     <!-- Action Buttons -->
-                                    <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
                                         @if(!$notification->read_at)
                                             <form method="POST" action="{{ route('notifications.mark-as-read', $notification->id) }}" class="inline">
                                                 @csrf
@@ -145,7 +145,7 @@
                         @empty
                             <div class="text-center py-12">
                                 <div class="text-4xl mb-3">📭</div>
-                                <p class="text-gray-500 dark:text-gray-400">Tidak ada notifikasi</p>
+                                <p class="text-gray-500">Tidak ada notifikasi</p>
                             </div>
                         @endforelse
                     </div>
