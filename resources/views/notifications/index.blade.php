@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-bold text-xl text-gray-900 dark:text-gray-100 leading-tight">
             {{ __('Notifikasi') }}
         </h2>
     </x-slot>
@@ -53,12 +53,12 @@
                     <div class="space-y-3">
                         @forelse($notifications as $notification)
                             <div class="flex items-start gap-4 p-4 rounded-lg border
-                                        {{ $notification->read_at ? 'border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800' : 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20' }}"
+                                        {{ $notification->read_at ? 'border-gray-200 bg-white' : 'border-blue-200 bg-blue-50' }}"
                                  id="notif-{{ $notification->id }}">
 
                                 <!-- Icon -->
                                 <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-xl
-                                            {{ $notification->read_at ? 'bg-gray-100 dark:bg-gray-700' : 'bg-blue-100 dark:bg-blue-900' }}">
+                                            {{ $notification->read_at ? 'bg-gray-100' : 'bg-blue-100' }}">
                                     @php
                                         $data = $notification->data ?? [];
                                         $type = $data['type'] ?? null;
@@ -95,10 +95,10 @@
                                                     $message = $type ? 'Tipe: ' . ($typeLabelMap[$type] ?? ucfirst($type)) . ', ' . ($data['created_at'] ?? '') : '';
                                                 }
                                             @endphp
-                                            <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            <h3 class="text-sm font-medium text-gray-900">
                                                 {{ $title }}
                                             </h3>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            <p class="text-xs text-gray-500 mt-1">
                                                 {{ $message }}
                                             </p>
                                         </div>
