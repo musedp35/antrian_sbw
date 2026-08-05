@@ -49,8 +49,7 @@
                         <!-- Notification Bell Container (Shared Alpine Component) -->
                         <div x-data="notificationBell" class="relative">
                             <!-- Notification Bell Button -->
-                            <button @click="showPopup = !showPopup; $nextTick(() => { if (showPopup) loadNotifications() })"
-                                    @mousedown.prevent
+                            <button @click="togglePopup()"
                                     @keyup.escape="closePopup()"
                                     type="button"
                                     class="relative inline-flex items-center justify-center text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-full w-10 h-10"
@@ -63,7 +62,7 @@
 
                             <!-- Notification Bell Popup -->
                             <div x-show="showPopup"
-                                 @click.away="closePopup()"
+                                 @click.outside="closePopup()"
                                  x-transition:enter="transition ease-out duration-300"
                                  x-transition:enter-start="opacity-0 translate-y-2"
                                  x-transition:enter-end="opacity-100 translate-y-0"
