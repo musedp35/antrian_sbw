@@ -43,6 +43,29 @@ class NotificationController extends Controller
     }
 
     /**
+     * Menghapus satu notifikasi.
+     */
+    public function destroy($id)
+    {
+        $notification = Auth::user()->notifications()->findOrFail($id);
+        $notification->delete();
+
+        return back()->with('success', 'Notifikasi berhasil dihapus.');
+    }
+
+    /**
+     * Menghapus semua notifikasi yang sudah dibaca.
+     */
+    public function deleteRead()
+    {
+        $deleted = Auth::user()->notifications()
+            ->whereNotNull('read_at')
+            ->delete();
+
+        return back()->with('success', "Berhasil menghapus {$deleted} notifikasi yang sudah dibaca.");
+    }
+
+    /**
      * Mendapatkan jumlah notifikasibelum dibaca.
      */
     public function countUnread()

@@ -4501,3 +4501,90 @@ Command `/note` dan `/resume` tidak dikenali oleh sistem Claude Agent saat ini (
 - Solusi sementara: Gunakan chat message natural (tanpa prefix `/`)
 - Contoh: "catatkan perubahan ke note.md", "buatkan resume untuk periode X-Y"
 - Atau tunggu konfigurasi command registry di sistem Claude Agent
+
+---
+
+## 📌 ENTRY: 2026-08-04 — Fix Popup Notifikasi Lonceng (401 Unauthorized)
+
+### 🎯 TUJUAN
+Memperbaiki popup notifikasi lonceng yang tidak menampilkan 5 notifikasi terbaru
+saat diklik, padahal badge merah menunjukkan jumlah 54 unread.
+
+### 🔍 MASALAH / ROOT CAUSE
+
+**Gejala:**
+- Badge merah menampilkan angka "54" (jumlah unread) dengan benar
+- Klik icon lonceng → popup terbuka TAPI kosong (tidak ada list notifikasi)
+- Console log menunjukkan: `GET /api/notifications/recent 401 (Unauthorized)`
+
+**Investigasi:**
+1. Backend API `/api/notifications/recent` mengembalikan 401
+2. Inspect route middleware via `php artisan route:list`:
+   - `/api/notifications/unread-count` → middleware: `web, auth, verified` ✓
+   - `/api/notifications/recent` → middleware: `api, auth:web` ✗
+3. **Root Cause**: Route `recent` berada di `routes/api.php` yang otomatis
+   menggunakan middleware group `api` (TIDAK memiliki `StartSession`).
+4. Cookie session dikirim browser, tapi session TIDAK DIMULAI karena tidak ada
+   `StartSession` middleware → Auth tidak bisa validasi → 401 Unauthorized.
+
+**Alasan kenapa `unread-count` berfungsi:**
+- Route tersebut didefinisikan di `routes/web.php` dengan middleware `web`
+- Middleware `web` memiliki `StartSession` → session aktif
+
+### ✅ SOLUSI / PERUBAHAN
+
+1. **Pindah routes API notifikasi dari `api.php` ke `web.php`**
+   - Ganti middleware dari `auth:sanctum`/`api` ke `['web', 'auth']`
+   - Sekarang session cookie terbaca dengan benar
+
+2. **Hapus duplikat route** `/api/notifications/unread-count` di web.php
+   (yang sebelumnya ada tanpa route `recent`)
+
+3. **Tambah CSS `[x-cloak]`** yang sebelumnya hilang
+   - Mencegah flash elemen popup sebelum Alpine.js siap
+
+4. **Tambah debug logs** di `notifications.js` untuk troubleshooting
+   - `[Bell] togglePopup() called`
+   - `[Bell] loadNotifications() called`
+   - `[Bell] Response status`
+   - `[Bell] Notifications set`
+
+5. **Tambah `setTimeout` 100ms** pada togglePopup
+   - Memastikan DOM siap sebelum fetch
+
+6. **Ganti `@click.away`** dengan `@click.outside`
+   - Menghindari race condition
+
+### 📁 FILE YANG DIUBAH
+| File | Perubahan |
+|------|-----------|
+| routes/web.php | Tambah Route::middleware(['web', 'auth'])->prefix('api/notifications') |
+| routes/web.php | Hapus duplikat route api/notifications/unread-count |
+| routes/api.php | Hapus routes notification (dipindah ke web.php) |
+| resources/css/app.css | Tambah [x-cloak] { display: none !important; } |
+| resources/js/notifications.js | Tambah debug logs, setTimeout, ganti @click.outside |
+| resources/views/layouts/navigation.blade.php | @click.away → @click.outside, hapus @mousedown.prevent |
+
+### 🧪 VERIFIKASI
+- [x] Console log menampilkan Response status: 200 (bukan 401)
+- [x] Popup menampilkan 5 notifikasi unread terbaru
+- [x] Badge merah tetap menampilkan "54" unread
+- [x] Popup tertutup saat klik di luar (@click.outside)
+- [x] Tombol escape menutup popup (@keyup.escape)
+- [x] Loading spinner muncul saat fetch
+- [x] User berhasil test dan konfirmasi popup berfungsi
+
+### 📊 DETAIL 5 NOTIFIKASI YANG MUNCUL
+```
+[1] UNREAD | 🎫 Tiket Baru: SPP-017
+[2] UNREAD | 🎫 Tiket Baru: SPP-016
+[3] UNREAD | 🏦 Tiket Baru: Tabungan-007
+[4] UNREAD | 🏦 Tiket Baru: Tabungan-007
+[5] UNREAD | 💵 Tiket Baru: Tunai-007
+```
+
+### 🔗 COMMITS TERKAIT
+- `5b8d54d` — fix: hapus @click.away, tambah setTimeout delay
+- `a9b0bc4` — fix: tambah debug log untuk troubleshooting
+- `00a9e5e` — fix: pindahkan routes dari api ke web middleware
+
