@@ -328,7 +328,7 @@ Edit file `.env` lalu sesuaikan variabel berikut:
 ```dotenv
 APP_NAME="Antrian SBW"
 APP_ENV=local
-APP_KEY=                        # di-generate otomatis oleh key:generate
+APP_KEY=
 APP_DEBUG=true
 APP_URL=http://localhost:8000
 
