@@ -31,7 +31,7 @@ class DisplayApiController extends Controller
             ->whereDate('created_at', $today)
             ->count();
 
-        $statsSelesai = Ticket::where('status', 'done')
+        $statsSelesai = Ticket::where('status', 'served')
             ->whereDate('created_at', $today)
             ->count();
 
@@ -41,6 +41,33 @@ class DisplayApiController extends Controller
         // Estimasi waktu tunggu: rata-rata 5 menit per tiket (heuristic)
         // Bisa disesuaikan dengan konfigurasi dari settings nanti
         $estimasiMenit = $statsWaiting * 5;
+
+        // === Last Called Ticket Per Kategori (SPP, Tunai, Tabungan) ===
+        // Ambil tiket terakhir yang dipanggil untuk masing-masing kategori hari ini.
+        // Digunakan oleh halaman Display untuk menampilkan 3 kartu kategori.
+        $types = ['spp', 'tunai', 'tabungan'];
+        $lastCalledByType = [];
+        foreach ($types as $type) {
+            $lastTicket = Ticket::where('type', $type)
+                ->where('status', 'called')
+                ->whereDate('created_at', $today)
+                ->orderByDesc('updated_at')
+                ->first();
+
+            $lastCalledByType[$type] = $lastTicket ? [
+                'id'            => $lastTicket->id,
+                'ticket_number' => $lastTicket->ticket_number,
+                'type'          => $lastTicket->type,
+                'type_label'    => match ($lastTicket->type) {
+                    'spp' => 'SPP',
+                    'tunai' => 'Tunai',
+                    'tabungan' => 'Tabungan',
+                    default => ucfirst($lastTicket->type),
+                },
+                'loket'         => $lastTicket->loket,
+                'updated_at'    => $lastTicket->updated_at->toIso8601String(),
+            ] : null;
+        }
 
         return response()->json([
             'called' => $called ? [
@@ -58,6 +85,8 @@ class DisplayApiController extends Controller
                 // (recall tidak ubah id, hanya touch updated_at)
                 'updated_at'    => $called->updated_at->toIso8601String(),
             ] : null,
+            // === Last Called Per Kategori (untuk 3 kartu display) ===
+            'lastCalledByType' => $lastCalledByType,
             'waiting' => $waiting->map(fn($t) => [
                 'id'            => $t->id,
                 'ticket_number' => $t->ticket_number,

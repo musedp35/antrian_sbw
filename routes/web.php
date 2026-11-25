@@ -37,7 +37,10 @@ Route::get('/display', function () {
 })->name('display');
 
 // Public API untuk display polling (no auth needed)
-Route::get('/api/tickets/display', [DisplayApiController::class, 'index'])->name('api.display');
+// Rate limit: 60 requests per menit (cukup untuk polling 2 detik)
+Route::get('/api/tickets/display', [DisplayApiController::class, 'index'])
+    ->middleware('throttle:60,1')
+    ->name('api.display');
 
 // Public Members — Cetak Tiket (no auth needed)
 Route::get('/members', [\App\Http\Controllers\MemberController::class, 'index'])->name('members.index');

@@ -87,6 +87,14 @@
         .called-pulse {
             animation: pulse-called 1.5s ease-in-out infinite;
         }
+        /* Pulse untuk kartu kategori */
+        @keyframes card-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .card-pulse-active {
+            animation: card-pulse 1.5s ease-in-out infinite;
+        }
         @media (max-width: 768px) {
             .main-layout {
                 flex-direction: column;
@@ -366,22 +374,11 @@
                                     <span class="card-face front">0</span>
                             </div>
                         </div>
-                        <span class="flip-separator">:</span>
-                        <div class="flip-digit-group">
-                            <div id="flip-ss1" class="flip-digit-card">
-                                <span class="card-face back">0</span>
-                                    <span class="card-face front">0</span>
-                            </div>
-                            <div id="flip-ss2" class="flip-digit-card">
-                                <span class="card-face back">0</span>
-                                    <span class="card-face front">0</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
                 {{-- Mobile fallback clock --}}
-                <span id="clock-mobile" class="text-gray-700 font-mono text-sm font-bold bg-gray-50 px-2 py-1 rounded border border-gray-200" style="display:none;">--:--:--</span>
+                <span id="clock-mobile" class="text-gray-700 font-mono text-sm font-bold bg-gray-50 px-2 py-1 rounded border border-gray-200" style="display:none;">--:--</span>
             </div>
         </div>
     </header>
@@ -438,13 +435,13 @@
         </section>
     </main>
 
-    {{-- === FOOTER: Daftar Antrian | Running Text (Sisi Kosong) | Total Tiket === --}}
+    {{-- === FOOTER: 3 Kartu Kategori Antrian | Running Text (Sisi Kosong) === --}}
     <footer class="w-full max-w-7xl mx-auto">
-        {{-- Baris: Daftar Antrian | Running Text (Sisi Kosong) | Total Tiket --}}
+        {{-- Baris: Nama Kategori | Running Text (Sisi Kosong) --}}
         <div class="bg-slate-50 rounded-t-xl border-b border-slate-200 px-3 sm:px-4 py-2 flex flex-row items-center justify-between gap-2 mb-2 w-full">
-            {{-- (1) Daftar Antrian (kiri, fixed) --}}
+            {{-- (1) Judul Kategori --}}
             <div class="flex items-center flex-shrink-0">
-                <h3 class="text-base sm:text-lg md:text-xl font-bold text-slate-800 whitespace-nowrap">Daftar Antrian :</h3>
+                <h3 class="text-base sm:text-lg md:text-xl font-bold text-slate-800 whitespace-nowrap">Kategori Antrian :</h3>
             </div>
 
             {{-- (2) Running Text — di Sisi Kosong (tengah, fleksibel) --}}
@@ -456,16 +453,33 @@
                 </div>
             </div>
 
-            {{-- (3) Total Tiket (kanan, fixed) --}}
-            <div class="flex-shrink-0">
-                <span class="bg-white border border-slate-200 text-slate-600 text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1 sm:py-1.5 rounded-full shadow-sm whitespace-nowrap inline-flex items-center h-8">
-                    <span class="text-orange-500 font-bold mr-1" id="count-number">0</span> tiket
-                </span>
-            </div>
+            {{-- (3) Placeholder kosong agar layout tetap simetris --}}
+            <div class="flex-shrink-0 w-20 sm:w-24 md:w-32"></div>
         </div>
-        {{-- flex-wrap: agar tiket lebih dari 5 otomatis wrap ke baris baru --}}
-        <div id="waiting-list" class="waiting-row flex flex-wrap gap-2 sm:gap-3 w-full min-h-[50px] mb-1 overflow-y-auto" style="max-height: 18vh;">
-            <p class="text-slate-400 text-center w-full py-3 text-sm">Belum ada antrian menunggu.</p>
+
+        {{-- === 3 Kartu Kategori Antrian === --}}
+        <div id="category-cards" class="waiting-row flex gap-2 sm:gap-3 w-full min-h-[140px] mb-1">
+            {{-- Kartu SPP --}}
+            <div id="card-spp" class="card-category flex-1 ticket-type-spp rounded-xl shadow-brutal-sm p-3 sm:p-4 text-white flex flex-col items-center justify-center min-h-[120px]">
+                <div class="text-xs sm:text-sm font-semibold uppercase opacity-90 mb-2 tracking-wider">SPP</div>
+                <div id="ticket-spp" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-center leading-tight">-</div>
+                <div id="loket-spp" class="text-xs sm:text-sm mt-2 font-medium opacity-90 text-yellow-200 text-center">Belum ada antrian</div>
+                <div id="time-spp" class="text-[10px] sm:text-xs opacity-70 mt-1 text-center">--:--</div>
+            </div>
+            {{-- Kartu Tunai --}}
+            <div id="card-tunai" class="card-category flex-1 ticket-type-tunai rounded-xl shadow-brutal-sm p-3 sm:p-4 text-white flex flex-col items-center justify-center min-h-[120px]">
+                <div class="text-xs sm:text-sm font-semibold uppercase opacity-90 mb-2 tracking-wider">Tunai</div>
+                <div id="ticket-tunai" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-center leading-tight">-</div>
+                <div id="loket-tunai" class="text-xs sm:text-sm mt-2 font-medium opacity-90 text-yellow-200 text-center">Belum ada antrian</div>
+                <div id="time-tunai" class="text-[10px] sm:text-xs opacity-70 mt-1 text-center">--:--</div>
+            </div>
+            {{-- Kartu Tabungan --}}
+            <div id="card-tabungan" class="card-category flex-1 ticket-type-tabungan rounded-xl shadow-brutal-sm p-3 sm:p-4 text-white flex flex-col items-center justify-center min-h-[120px]">
+                <div class="text-xs sm:text-sm font-semibold uppercase opacity-90 mb-2 tracking-wider">Tabungan</div>
+                <div id="ticket-tabungan" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-center leading-tight">-</div>
+                <div id="loket-tabungan" class="text-xs sm:text-sm mt-2 font-medium opacity-90 text-yellow-200 text-center">Belum ada antrian</div>
+                <div id="time-tabungan" class="text-[10px] sm:text-xs opacity-70 mt-1 text-center">--:--</div>
+            </div>
         </div>
     </footer>
 
@@ -474,8 +488,7 @@
             const now = new Date();
             const hh = String(now.getHours()).padStart(2, '0');
             const mm = String(now.getMinutes()).padStart(2, '0');
-            const ss = String(now.getSeconds()).padStart(2, '0');
-            const timeStr = hh + ':' + mm + ':' + ss;
+            const timeStr = hh + ':' + mm;
 
             // Tanggal lengkap: "Selasa, 29 Juli 2026"
             const dateLong = now.toLocaleDateString('id-ID', {
@@ -498,7 +511,6 @@
 const flipMap = {
     'flip-hh1': hh[0], 'flip-hh2': hh[1],
     'flip-mm1': mm[0], 'flip-mm2': mm[1],
-    'flip-ss1': ss[0], 'flip-ss2': ss[1],
 };
 // Cache previous values agar deteksi perubahan lebih akurat
 if (!window._flipPrev) window._flipPrev = {};
@@ -947,6 +959,18 @@ Object.keys(flipMap).forEach(id => {
         let lastCalledUpdatedAt = null;
         let isSpeechEnabled = true;
 
+        // === TRACKING PER KATEGORI (untuk handle concurrent calls) ===
+        // Setiap kategori (spp, tunai, tabungan) tracking last ticket-nya sendiri
+        // Ini diperlukan karena admin bisa memanggil tiket dari kategori berbeda secara bersamaan
+        const lastCalledByTypeState = {
+            spp: { id: null, updated_at: null },
+            tunai: { id: null, updated_at: null },
+            tabungan: { id: null, updated_at: null }
+        };
+
+        // === TTS QUEUE SYSTEM (untuk antrian panggilan concurrent) ===
+        // Fungsi toggleAudio didefinisikan di bawah (setelah TTS queue system)
+
         function toggleAudio() {
             isSpeechEnabled = !isSpeechEnabled;
             const btn = document.getElementById('audio-toggle');
@@ -1035,6 +1059,13 @@ Object.keys(flipMap).forEach(id => {
             }
         }
 
+        // === TIPE WARNA (dideklarasikan lebih awal agar bisa diakses oleh fungsi di bawah) ===
+        const typeColors = {
+            'spp': { bgStart: '#2563eb', bgEnd: '#1d4ed8', textColor: '#ffffff' },
+            'tunai': { bgStart: '#7c3aed', bgEnd: '#6d28d9', textColor: '#ffffff' },
+            'tabungan': { bgStart: '#0d9488', bgEnd: '#0f766e', textColor: '#ffffff' }
+        };
+
         function generateTTSText(ticketNumber, type, loket) {
             const parts = ticketNumber.split('-');
             if (parts.length !== 2) return 'Nomor antrian ' + ticketNumber + ', silakan menuju ' + (loket || 'loket');
@@ -1104,7 +1135,72 @@ Object.keys(flipMap).forEach(id => {
             savedVideoVolume = null;
         }
 
-        function speakText(text) {
+        // === TTS QUEUE SYSTEM (dengan sinkronisasi display) ===
+        // Queue menyimpan: { text, ticketNumber, type, loket }
+        let ttsQueue = [];
+        let ttsSpeaking = false;
+        let ttsQueueActive = false;
+        let currentTTSIndex = 0; // Posisi TTS yang sedang dibunyikan
+
+        // Fungsi untuk update display sesuai TTS yang sedang dibunyikan
+        function updateDisplayForTTS(ticketNumber, type, loket) {
+            const calledTicketCard = document.getElementById('called-ticket-card');
+            const calledNumberEl = document.getElementById('called-number');
+            const calledTypeEl = document.getElementById('called-type');
+            const calledLoketEl = document.getElementById('called-loket');
+            const calledNumberReadableEl = document.getElementById('called-number-readable');
+
+            if (!calledTicketCard) return;
+
+            const color = typeColors[type] || typeColors['spp'];
+            const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
+
+            // Update background warna sesuai tipe
+            calledTicketCard.style.background = 'linear-gradient(135deg, ' + color.bgStart + ', ' + color.bgEnd + ')';
+
+            if (calledNumberEl) calledNumberEl.textContent = ticketNumber;
+            if (calledTypeEl) calledTypeEl.textContent = typeLabel;
+            if (calledLoketEl) {
+                if (loket) {
+                    // Eja akronim seperti TTS
+                    const loketEja = loket.replace(/\b([A-Z]{2,})\b/g, function(m){ return m.split('').join(' '); });
+                    calledLoketEl.textContent = '🏦 ' + loketEja;
+                } else {
+                    calledLoketEl.textContent = 'Loket ' + typeLabel;
+                }
+            }
+
+            // Update readable format (sinkron dengan TTS ejaan)
+            if (calledNumberReadableEl && ticketNumber) {
+                const parts = ticketNumber.split('-');
+                if (parts.length === 2) {
+                    const prefix = parts[0];
+                    const number = parts[1];
+                    const digits = {
+                        '0': 'nol', '1': 'satu', '2': 'dua', '3': 'tiga',
+                        '4': 'empat', '5': 'lima', '6': 'enam', '7': 'tujuh',
+                        '8': 'delapan', '9': 'sembilan'
+                    };
+                    let readable = '';
+                    for (let char of prefix) {
+                        readable += char + ' ';
+                    }
+                    for (let digit of number) {
+                        readable += (digits[digit] || digit) + ' ';
+                    }
+                    calledNumberReadableEl.textContent = readable.trim();
+                    calledNumberReadableEl.classList.remove('hidden');
+                }
+            }
+
+            // Animasi pulse
+            calledTicketCard.classList.remove('called-pulse');
+            void calledTicketCard.offsetWidth;
+            calledTicketCard.classList.add('called-pulse');
+        }
+
+        // Menambahkan item TTS ke antrian (dengan metadata untuk sinkronisasi display)
+        function enqueueTTSText(text, ticketNumber, type, loket) {
             if (!appSettings.tts_auto_play || !isSpeechEnabled) {
                 console.log('[Display] TTS skipped: disabled by settings or user');
                 return;
@@ -1114,75 +1210,139 @@ Object.keys(flipMap).forEach(id => {
                 return;
             }
 
-            window.speechSynthesis.cancel();
-            // Jika ada TTS yang sedang berjalan dengan ducking aktif,
-            // pastikan tetap mute sampai TTS baru ini selesai
-            // (savedVideoMutedState sudah disimpan dari pemanggilan pertama)
+            // Cek apakah user sudah berinteraksi (klik di halaman)
+            // Browser modern (Chrome) memblokir autoplay speech tanpa interaksi
+            if (!userInteracted) {
+                console.warn('[Display] TTS belum bisa: user belum berinteraksi dengan halaman. Silakan klik tombol audio.');
+                // Tetap update display meskipun TTS belum bisa
+                updateDisplayForTTS(ticketNumber || '', type || '', loket || '');
+                return;
+            }
 
-            setTimeout(() => {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'id-ID';
-                utterance.rate = appSettings.tts_rate || 0.9;
-                utterance.pitch = 1.0;
-                utterance.volume = (appSettings.tts_volume || 100) / 100;
+            console.log('[TTS Queue] Menambahkan ke antrian:', text, '| Tiket:', ticketNumber, '| Tipe:', type);
+            ttsQueue.push({
+                text: text,
+                ticketNumber: ticketNumber || '',
+                type: type || '',
+                loket: loket || ''
+            });
 
-                const voices = window.speechSynthesis.getVoices();
-                const idVoice = voices.find(v => v.lang.startsWith('id'));
-                if (idVoice) {
-                    utterance.voice = idVoice;
+            // Jika queue belum aktif, mulai proses
+            if (!ttsQueueActive && !ttsSpeaking) {
+                ttsQueueActive = true;
+                processTTSQueue();
+            }
+        }
+
+        // Memproses antrian TTS satu per satu dengan sinkronisasi display
+        function processTTSQueue() {
+            if (ttsQueue.length === 0) {
+                ttsQueueActive = false;
+                ttsSpeaking = false;
+                currentTTSIndex = 0;
+                return;
+            }
+
+            ttsSpeaking = true;
+            const item = ttsQueue.shift();  // Ambil pertama dari antrian
+            currentTTSIndex++;
+            console.log('[TTS Queue] Memulai TTS #' + currentTTSIndex + ':', item.text, '(sisa antrian:', ttsQueue.length + ')');
+
+            // === UPDATE DISPLAY SESUAI TTS YANG AKAN DIBUNYIKAN ===
+            // Ini memastikan tampilan sinkron dengan suara
+            if (item.ticketNumber && item.type) {
+                console.log('[Display Sync] Update display ke:', item.ticketNumber, '(' + item.type + ')');
+                updateDisplayForTTS(item.ticketNumber, item.type, item.loket);
+            }
+
+            const utterance = new SpeechSynthesisUtterance(item.text);
+            utterance.lang = 'id-ID';
+            utterance.rate = appSettings.tts_rate || 0.9;
+            utterance.pitch = 1.0;
+            utterance.volume = (appSettings.tts_volume || 100) / 100;
+
+            const voices = window.speechSynthesis.getVoices();
+            const idVoice = voices.find(v => v.lang.startsWith('id'));
+            if (idVoice) {
+                utterance.voice = idVoice;
+            }
+
+            // Audio Ducking
+            muteVideoForTTS();
+
+            utterance.onstart = () => {
+                console.log('[Display] TTS #' + currentTTSIndex + ' started:', item.ticketNumber);
+                const v = document.getElementById('video-player');
+                if (v && !v.muted) {
+                    v.muted = true;
+                }
+            };
+
+            utterance.onerror = (e) => {
+                console.error('[Display] TTS error:', e.error, '- Message:', e.message || 'Unknown error');
+
+                // Handle specific error: not-allowed (browser policy)
+                if (e.error === 'not-allowed') {
+                    console.warn('[Display] TTS diblokir browser - perlu interaksi pengguna terlebih dahulu');
+                    // Tandai sebagai speaking selesai agar queue lanjut
+                    ttsSpeaking = false;
+                    // Lanjutkan ke TTS berikutnya tanpa delay
+                    setTimeout(processTTSQueue, 100);
+                    return;
                 }
 
-                // === Audio Ducking: mute video selama TTS ===
-                muteVideoForTTS();
+                restoreVideoAfterTTS();
+                ttsSpeaking = false;
+                // Lanjutkan ke TTS berikutnya
+                setTimeout(processTTSQueue, 100);
+            };
 
-                utterance.onstart = () => {
-                    console.log('[Display] TTS started:', text);
-                    // Pastikan video tetap mute saat TTS mulai
+            utterance.onend = () => {
+                console.log('[Display] TTS #' + currentTTSIndex + ' finished:', item.ticketNumber);
+                restoreVideoAfterTTS();
+                ttsSpeaking = false;
+                // Lanjutkan ke TTS berikutnya dengan delay sedikit
+                setTimeout(processTTSQueue, 300);
+            };
+
+            window.speechSynthesis.speak(utterance);
+
+            // Keep alive interval untuk mencegah browser menghentikan TTS
+            const keepAlive = setInterval(() => {
+                if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                    window.speechSynthesis.pause();
+                    window.speechSynthesis.resume();
                     const v = document.getElementById('video-player');
-                    if (v && !v.muted) {
+                    if (v && !v.muted && videoDuckingActive) {
                         v.muted = true;
                     }
-                };
-                utterance.onerror = (e) => {
-                    console.error('[Display] TTS error:', e);
-                    // Kembalikan volume video saat error
-                    restoreVideoAfterTTS();
-                };
-                utterance.onend = () => {
-                    console.log('[Display] TTS finished:', text);
-                    // Kembalikan video audio setelah TTS selesai
-                    restoreVideoAfterTTS();
-                };
-
-                window.speechSynthesis.speak(utterance);
-
-                const keepAlive = setInterval(() => {
-                    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-                        window.speechSynthesis.pause();
-                        window.speechSynthesis.resume();
-                        // Pastikan video tetap mute selama TTS berlangsung
-                        const v = document.getElementById('video-player');
-                        if (v && !v.muted && videoDuckingActive) {
-                            v.muted = true;
-                        }
-                    } else {
-                        clearInterval(keepAlive);
-                    }
-                }, 10000);
-            }, 50);
+                } else {
+                    clearInterval(keepAlive);
+                }
+            }, 10000);
         }
 
+        // Fungsi speakText tetap ada untuk backward compatibility
+        function speakText(text) {
+            enqueueTTSText(text, '', '', '');
+        }
+
+        // Pre-load voices untuk memastikan suara Indonesia tersedia
         if ('speechSynthesis' in window) {
+            // Force voice loading
+            window.speechSynthesis.getVoices();
+
             window.speechSynthesis.onvoiceschanged = () => {
-                window.speechSynthesis.getVoices();
+                const voices = window.speechSynthesis.getVoices();
+                console.log('[Display] Voices loaded:', voices.length);
+                const idVoice = voices.find(v => v.lang.startsWith('id'));
+                if (idVoice) {
+                    console.log('[Display] Indonesian voice found:', idVoice.name);
+                } else {
+                    console.warn('[Display] No Indonesian voice found, using default');
+                }
             };
         }
-
-        const typeColors = {
-            'spp': { bgStart: '#2563eb', bgEnd: '#1d4ed8', textColor: '#ffffff' },
-            'tunai': { bgStart: '#7c3aed', bgEnd: '#6d28d9', textColor: '#ffffff' },
-            'tabungan': { bgStart: '#0d9488', bgEnd: '#0f766e', textColor: '#ffffff' }
-        };
 
         async function fetchTickets() {
             try {
@@ -1192,47 +1352,44 @@ Object.keys(flipMap).forEach(id => {
 
                 const called = data.called || null;
                 const calledTicketCard = document.getElementById('called-ticket-card');
-                const calledNumberEl = document.getElementById('called-number');
-                const calledTypeEl = document.getElementById('called-type');
-                const calledLoketEl = document.getElementById('called-loket');
 
-                if (called && calledTicketCard) {
-                    const color = typeColors[called.type] || typeColors['spp'];
-                    const typeLabel = called.type_label || (called.type ? called.type.charAt(0).toUpperCase() + called.type.slice(1) : 'Umum');
+                // === KUMPULKAN SEMUA TIKET BARU (1 ENQUEUE PER TIKET UNIK) ===
+                // Mencegah duplikat TTS: pakai Set untuk tracking tiket yang sudah di-enqueue
+                const newTicketsToEnqueue = [];
+                const now = Date.now();
 
-                    calledTicketCard.style.background = 'linear-gradient(135deg, ' + color.bgStart + ', ' + color.bgEnd + ')';
-
-                    if (calledNumberEl) calledNumberEl.textContent = called.ticket_number;
-                    if (calledTypeEl) calledTypeEl.textContent = typeLabel;
-                    if (calledLoketEl) calledLoketEl.textContent = called.loket ? '→ ' + called.loket : '';
-                } else {
-                    if (calledTicketCard) calledTicketCard.style.background = '#475569';
-                    if (calledNumberEl) calledNumberEl.textContent = '-';
-                    if (calledTypeEl) calledTypeEl.textContent = 'Menunggu panggilan...';
-                    if (calledLoketEl) calledLoketEl.textContent = '';
-                }
-
+                // 1. TTS untuk MAIN call (yang tampil di display utama)
                 if (called) {
                     const currentTicketId = called.id || called.ticket_number;
                     const currentUpdatedAt = called.updated_at || null;
 
-                    const isNewCall = lastCalledTicketId !== null && lastCalledTicketId !== currentTicketId;
-                    const isRecall  = lastCalledTicketId === currentTicketId && currentUpdatedAt && lastCalledUpdatedAt !== currentUpdatedAt;
+                    // Check if this is the first load with existing called ticket
+                    const isFirstLoad = lastCalledTicketId === null && lastCalledUpdatedAt === null;
+
+                    const isInitialCall = isFirstLoad;
+                    const isNewCall = !isFirstLoad && lastCalledTicketId !== null && lastCalledTicketId !== currentTicketId;
+                    const isRecall = lastCalledTicketId === currentTicketId && currentUpdatedAt && lastCalledUpdatedAt !== currentUpdatedAt;
 
                     console.log('[Display Polling]', {
                         currentTicketId,
                         currentUpdatedAt,
                         lastCalledTicketId,
                         lastCalledUpdatedAt,
+                        isFirstLoad,
+                        isInitialCall,
                         isNewCall,
                         isRecall,
                         speechEnabled: isSpeechEnabled,
                     });
 
-                    if (isNewCall || isRecall) {
-                        const ttsText = generateTTSText(called.ticket_number, called.type, called.loket);
-                        console.log('[Display] TTS Triggered:', ttsText, '(isNewCall:', isNewCall, ', isRecall:', isRecall, ', loket:', called.loket, ')');
-                        speakText(ttsText);
+                    // Trigger TTS jika: first load with called ticket, new call, atau recall
+                    if (isInitialCall || isNewCall || isRecall) {
+                        newTicketsToEnqueue.push({
+                            ticketNumber: called.ticket_number,
+                            type: called.type,
+                            loket: called.loket
+                        });
+                        console.log('[Display] TTS enqueued for:', called.ticket_number);
                     }
 
                     lastCalledTicketId = currentTicketId;
@@ -1242,74 +1399,150 @@ Object.keys(flipMap).forEach(id => {
                     lastCalledUpdatedAt = null;
                 }
 
-                const waitingEl = document.getElementById('waiting-list');
-                const countEl = document.getElementById('count-number');
+                // 2. PER KATEGORI - Deteksi tiket baru per tipe
+                const types = ['spp', 'tunai', 'tabungan'];
+                const lastCalledByType = data.lastCalledByType || {};
+                const lastCalledByTypeArray = types.map(t => lastCalledByType[t] || null);
 
-                if (!waitingEl) return;
+                types.forEach((type, idx) => {
+                    const ticket = lastCalledByTypeArray[idx];
+                    const ticketEl = document.getElementById('ticket-' + type);
+                    const loketEl = document.getElementById('loket-' + type);
+                    const timeEl = document.getElementById('time-' + type);
+                    const cardEl = document.getElementById('card-' + type);
 
-                // Statistik dihapus dari UI (perubahan layout 100% desktop),
-                // tapi data.stats masih diambil dari API untuk caching/kebutuhan lain (TTS countdown, dll).
-                if (data.stats) {
-                    const setStat = (id, val) => {
-                        const el = document.getElementById(id);
-                        if (el) el.textContent = val;
-                    };
-                    // Setter di-skip dulu (elemen tidak ada), tapi data stats tetap tersedia.
-                }
+                    if (!ticketEl) return;
 
-                if (data.waiting.length > 0) {
-                    if (countEl) countEl.textContent = data.waiting.length;
+                    const ticketKey = type + '-ticket-id';
+                    const currentTicketId = ticket ? (ticket.id || ticket.ticket_number) : null;
+                    const prevTicketId = window['_lastCalledType_' + ticketKey];
 
-                    const waitingHtml = data.waiting.map((t, index) => {
-                        const position = index + 1;
-                        const typeClass = 'ticket-type-' + (t.type || 'spp');
-                        const typeLabel = t.type_label || (t.type ? t.type.charAt(0).toUpperCase() + t.type.slice(1) : 'Umum');
-
-                        let waitText = '';
-                        if (t.created_at) {
-                            const created = new Date(t.created_at);
-                            const now = new Date();
-                            const diffMs = now - created;
-                            const diffMin = Math.floor(diffMs / 60000);
-                            if (diffMin < 1) waitText = 'Baru';
-                            else if (diffMin < 60) waitText = diffMin + ' mnt';
-                            else waitText = Math.floor(diffMin / 60) + ' jam';
+                    if (ticket && ticket.ticket_number) {
+                        let timeStr = '--:--';
+                        if (ticket.updated_at) {
+                            const d = new Date(ticket.updated_at);
+                            const h = String(d.getHours()).padStart(2, '0');
+                            const m = String(d.getMinutes()).padStart(2, '0');
+                            timeStr = h + ':' + m;
                         }
 
-                        return '<div class="' + typeClass + ' shadow-brutal-sm ticket-card-flex card-enter min-w-[120px]"'
-                            + ' title="Antrian ke-' + position + ' - Tipe: ' + typeLabel + ' - Nomor: ' + t.ticket_number + '">'
-                            + '<div class="text-center">'
-                            + '<div class="text-[10px] font-semibold uppercase mt-1 opacity-90">' + typeLabel + '</div>'
-                            // + '<div class="text-[10px] font-semibold uppercase opacity-90 mb-1">#' + position + '</div>'
-                            + '<div class="text-base sm:text-lg md:text-xl font-extrabold leading-tight drop-shadow-md">' + t.ticket_number + '</div>'
-                            + (waitText ? '<div class="text-[9px] mt-0.5 opacity-75">' + waitText + '</div>' : '')
-                            + '</div>'
-                            + '</div>';
-                    }).join('');
+                        ticketEl.textContent = ticket.ticket_number;
+                        loketEl.textContent = ticket.loket || 'Belum ada antrian';
+                        timeEl.textContent = timeStr;
 
-                    if (waitingEl.innerHTML !== waitingHtml) {
-                        waitingEl.innerHTML = waitingHtml;
+                        // Animasi pulse jika ada perubahan
+                        if (prevTicketId !== undefined && prevTicketId !== currentTicketId) {
+                            if (cardEl) {
+                                cardEl.classList.add('card-pulse-active');
+                                setTimeout(() => {
+                                    cardEl.classList.remove('card-pulse-active');
+                                }, 3000);
+                            }
+                        }
+
+                        // === DETEKSI TIKET BARU PER KATEGORI ===
+                        const state = lastCalledByTypeState[type];
+                        const isCategoryInitialCall = state.id === null && state.updated_at === null;
+                        const isCategoryNewCall = !isCategoryInitialCall && state.id !== null && state.id !== currentTicketId;
+                        const isCategoryRecall = state.id === currentTicketId && ticket.updated_at && state.updated_at !== ticket.updated_at;
+
+                        console.log('[Display Category]', {
+                            type,
+                            ticketNumber: ticket.ticket_number,
+                            currentId: currentTicketId,
+                            prevStateId: state.id,
+                            isInitialCall: isCategoryInitialCall,
+                            isNewCall: isCategoryNewCall,
+                            isRecall: isCategoryRecall
+                        });
+
+                        // Hanya enqueue jika tiket ini BELUM di-enqueue (cegah duplikat)
+                        if (isCategoryInitialCall || isCategoryNewCall || isCategoryRecall) {
+                            // Cek duplikat: apakah tiket ini sudah ada di newTicketsToEnqueue?
+                            const alreadyQueued = newTicketsToEnqueue.some(t =>
+                                t.ticketNumber === ticket.ticket_number && t.type === ticket.type
+                            );
+
+                            if (!alreadyQueued) {
+                                newTicketsToEnqueue.push({
+                                    ticketNumber: ticket.ticket_number,
+                                    type: ticket.type,
+                                    loket: ticket.loket
+                                });
+                                console.log('[Display Category] TTS perlu dibunyikan:', type, ticket.ticket_number);
+                            }
+                        }
+
+                        // UPDATE STATE SETELAH PENGECEKAN
+                        state.id = currentTicketId;
+                        state.updated_at = ticket.updated_at || null;
+                    } else {
+                        ticketEl.textContent = '-';
+                        loketEl.textContent = 'Belum ada antrian';
+                        timeEl.textContent = '--:--';
                     }
-                } else {
-                    const emptyHtml = '<p class="text-slate-400 text-center w-full py-6 text-base">Belum ada antrian menunggu.</p>';
-                    if (countEl) countEl.textContent = '0';
-                    if (waitingEl.innerHTML !== emptyHtml) {
-                        waitingEl.innerHTML = emptyHtml;
-                    }
-                }
+
+                    window['_lastCalledType_' + ticketKey] = currentTicketId;
+                });
+
+                // === SORT BY CREATED TIME (Tiket yang dipanggil lebih awal duluan) ===
+                // Format tiket: SPP-001, Tunai-001, Tabungan-001 (dengan tanda hubung)
+                newTicketsToEnqueue.sort((a, b) => {
+                    const aNum = parseInt(a.ticketNumber.split('-')[1]) || 0;
+                    const bNum = parseInt(b.ticketNumber.split('-')[1]) || 0;
+                    return aNum - bNum; // ASC: tiket nomor kecil duluan
+                });
+
+                // === ENQUEUE SEMUA TIKET BARU (TANPA DUPLIKAT) ===
+                newTicketsToEnqueue.forEach(item => {
+                    const ttsText = generateTTSText(item.ticketNumber, item.type, item.loket);
+                    console.log('[Display] Enqueue TTS:', ttsText);
+                    enqueueTTSText(ttsText, item.ticketNumber, item.type, item.loket);
+                });
             } catch (e) {
                 console.warn('[Display] Polling error:', e);
             }
         }
 
-        document.addEventListener('click', function initAudio() {
-            if ('speechSynthesis' in window) {
+        // Track user interaction untuk unlock SpeechSynthesis
+        let userInteracted = false;
+        let audioInitialized = false;
+
+        // Fungsi untuk unlock speech synthesis
+        function unlockSpeechSynthesis() {
+            if (!audioInitialized && 'speechSynthesis' in window) {
+                // Cancel any pending utterances
+                window.speechSynthesis.cancel();
+
+                // Create and speak an empty utterance to unlock
                 const test = new SpeechSynthesisUtterance('');
                 test.volume = 0;
                 window.speechSynthesis.speak(test);
+
+                audioInitialized = true;
+                userInteracted = true;
+                console.log('[Display] Audio unlocked - speech synthesis initialized');
             }
-            document.removeEventListener('click', initAudio);
-        }, { once: true });
+        }
+
+        // Auto-unlock after first load (with slight delay for page render)
+        setTimeout(unlockSpeechSynthesis, 500);
+
+        // Also unlock on any click
+        document.addEventListener('click', function initAudio() {
+            unlockSpeechSynthesis();
+            console.log('[Display] Audio initialized - user interaction detected');
+        }, { once: false });
+
+        // Jika user klik tombol audio toggle, tandai sebagai interacted
+        const audioToggleBtn = document.getElementById('audio-toggle');
+        if (audioToggleBtn) {
+            audioToggleBtn.addEventListener('click', function() {
+                unlockSpeechSynthesis();
+                userInteracted = true;
+                console.log('[Display] Audio toggle clicked - user interacted');
+            });
+        }
 
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && 'speechSynthesis' in window) {

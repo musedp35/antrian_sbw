@@ -202,8 +202,8 @@ class SettingController extends Controller
 
             DB::commit();
 
-            // Clear config cache so changes take effect
-            \Illuminate\Support\Facades\Artisan::call('config:clear');
+            // Clear settings cache only (lightweight, not full config cache)
+            \Illuminate\Support\Facades\Cache::forget('settings.all');
 
             // Broadcast notifikasi sistem ke semua admin (kecuali yang sedang update)
             $this->broadcastSettingUpdated($existingSettings, $validated);
