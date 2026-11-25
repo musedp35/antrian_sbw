@@ -21,7 +21,7 @@ secara **real-time** dengan tampilan display modern, notifikasi, dan TTS otomati
 ## 📖 Tentang Project
 
 **Antrian SBW** adalah aplikasi yang dirancang untuk melayani proses antrian
-nasabah Bank Sampah dengan:
+nasabah Koperasi SBW dengan:
 - Nomor antrian otomatis berdasarkan tipe layanan (SPP, Tunai, Tabungan)
 - Tampilan display real-time dengan Text-to-Speech (TTS)
 - Notifikasi popup untuk admin/operator
@@ -143,7 +143,7 @@ Project ini open-source di bawah lisensi MIT. Anda bebas menggunakan, memodifika
 
 <div align="center">
 
-**Dibuat dengan ❤️ untuk Bank Sampah**
+**Dibuat dengan ❤️ untuk Koperasi SBW**
 
 ⭐ Jangan lupa beri star jika project ini bermanfaat!
 
